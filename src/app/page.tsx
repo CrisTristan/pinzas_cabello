@@ -1,6 +1,8 @@
+
 import { LandingPage } from "@/components/landingPage"
 import {products} from "@/components/products.js"
 import Image from "next/image"
+import { ProductCard } from "../components/ProductCard"
 
 export default function Home() {
 
@@ -10,19 +12,13 @@ export default function Home() {
       
       <div className="grid grid-cols-1 gap-10 m-5">
         {products.map((product, i) => (
-        <div key={i}
-          className="bg-slate-500 text-center p-4 rounded-md flex flex-col items-center"
-        >
-          <h2>Product name</h2>
-          <Image
-            src={product.image}
-            width={50}
-            height={50}
-            alt="producto"
-          />
-          <p>100</p>
-          <button>Pagar</button>
-        </div>
+        <ProductCard
+          key= {i}
+          id={product.id}
+          name={product.name}
+          price={product.price}
+          image={product.image}
+        />
       ))}
       </div>
     </div>
