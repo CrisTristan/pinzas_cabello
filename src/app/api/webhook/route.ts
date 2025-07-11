@@ -39,6 +39,12 @@ export async function POST(request: Request) {
 
       console.log("Checkout session completed:", checkoutSessionCompleted);
       break;
+    case "payment_intent.succeeded":
+      const paymentIntentSucceeded = event.data.object;
+      // Aquí puedes manejar el pago exitoso
+      console.log("PaymentIntent was successful!", paymentIntentSucceeded);
+      break;
+      
     default:
       console.log("Evento no manejado:", event.type);
   }

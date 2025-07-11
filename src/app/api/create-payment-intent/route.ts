@@ -1,21 +1,25 @@
-// api/create-payment-intent/route.ts
-import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { metadata } from '@/app/layout';
+import { NextRequest, NextResponse } from 'next/server';
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil',
-});
+export async function POST(request: NextRequest) {
 
-export async function POST() {
   try {
+    const {amount, products} = await request.json();
+    // const {products} = await request.json();
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 5000, // $50.00 MXN
+      amount: amount, // $50.00 MXN
       currency: 'mxn',
       automatic_payment_methods: { enabled: true },
+      metadata: {
+        productos: JSON.stringify(products),
+      }
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
+    console.log("internal error:", err)
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
 }

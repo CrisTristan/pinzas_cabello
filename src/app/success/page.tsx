@@ -1,6 +1,14 @@
-import React from 'react'
+"use client";
+
+import React, { useEffect } from 'react'
 
 export default function SuccessPage() : React.JSX.Element {
+
+  useEffect(() => {
+    // Limpiar el carrito al completar la compra
+    localStorage.removeItem('cart');
+  }, []);
+
   return (
     <div
       className='text-3xl font-bold text-center py-10 h-screen flex items-center justify-center'
