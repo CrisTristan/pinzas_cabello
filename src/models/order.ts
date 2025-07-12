@@ -1,14 +1,13 @@
 import mongoose, { model } from "mongoose";
+import { required } from "zod/mini";
 
 const schema = new mongoose.Schema({
     id: String,
     name: String,
-    address: {line1: String, line2: String, city: String, state: String, zip: String},
+    address: {nombre: String, telefono: String, calle: String, numero: String, colonia: String, codigoPostal: Number},
     products: [{
-        id: String,
-        name: String,
-        price: Number,
-        image: String,
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        selectedOption: { type: String, required: true }, // se guarda como 'type'
         quantity: { type: Number, default: 1 },
     }],
     total: Number,

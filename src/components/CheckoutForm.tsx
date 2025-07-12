@@ -11,28 +11,19 @@ import {
 } from '@stripe/react-stripe-js';
 import convertToSubcurrency from '@/lib/convertToSubcurrency';
 import { Product } from '@/types/product';
+import ShippingForm from './ShippingForm';
+import { set } from 'mongoose';
 
 export const CheckoutForm = ({amount, products}: {amount: number, products: Product}) => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const [phone, setPhone] = useState('');
-  const [errorPhone, setErrorPhone] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<boolean>(false);
-  const [errorAddress1, setErrorAddress1] = useState<boolean>(false);
-  const [errorAddress2, setErrorAddress2] = useState<boolean>(false);
-
-
-  const [address, setAddress] = useState({
-    line1: '',
-    line2: '',
-    city: '',
-  });
-
+  const [shippingData, setShippingData] = useState<any>(null);
 
   useEffect(() => {
     fetch('/api/create-payment-intent', { 
@@ -42,12 +33,21 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       },
       body: JSON.stringify({
         amount: convertToSubcurrency(amount),
-        products: JSON.stringify(products) 
-      }), // Convert to subcurrency
+        products: products,
+        shippingData: shippingData, 
+      }), 
     })
     .then(res => res.json())
     .then(data => setClientSecret(data.clientSecret));
-  }, [amount]);
+  }, [amount, shippingData]);
+
+  const handleShippingForm = (shippingData: any) => {
+    //console.log("Datos de envío recibidos desde el componente hijo:", shippingData);
+    setShippingData(shippingData);
+    const { neighborhood } = shippingData;
+    //console.log("Vecindario:", neighborhood);
+    setAddress(neighborhood);
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,42 +63,23 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
         return;
     }
 
-    // Validación manual del teléfono
-    if (!phone || phone.trim() === '' || phone.length < 10) {
-      setErrorPhone(true);
-      setLoading(false);
-      toast.error("El número de teléfono es obligatorio y debe tener al menos 10 dígitos.");
-      return;
-    }
-
-    // Debes esperar a que la validación de la dirección termine antes de continuar.
-    // El problema es que fetch es asíncrono y no esperas su resultado antes de continuar.
-    // Solución: usa await en la validación de dirección y retorna si hay error.
-
-    // Mueve la validación de dirección aquí y usa await:
-    if(address.line1 === ""){
-        toast.error("Ingrese una direccion completa en Primera Linea de Dirección incluyendo Calle")
-        setErrorAddress1(true);
-        setLoading(false);
-        return;
-    }
-
-    if(address.line2 === ""){
-      toast.error('Ingrese su numero de casa o apartamento en Segunda linea de Dirección')
-      setErrorAddress2(true);
+    if(!shippingData || !shippingData.fullName || !shippingData.phone || !shippingData.street || !shippingData.number || !shippingData.neighborhood || !shippingData.postalCode) {
+      toast.error("Por favor, completa todos los campos de envío.");
       setLoading(false);
       return;
     }
 
-    const SearchForAddress = address.line1;
+    const SearchForAddress = address; //-----------------------------------
     const resultado = SearchForAddress.replace(/ /g, "+");
     try {
       const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${resultado}&key=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_API_KEY}`);
       const data = await res.json();
       console.log("Respuesta de la API de Google Maps:", data);
-      const city = data.results[0]?.address_components[2]?.long_name;
-      //console.log("Ciudad encontrada:", city);
-      if(city !== 'Cancún'){
+      const city = data.results[0]?.address_components[1]?.long_name;
+      const city2= data.results[0]?.address_components[2]?.long_name;
+
+      console.log("Ciudad encontrada:", city);
+      if((city !== 'Cancún') && (city2 !== 'Cancún')){
           toast.error("La dirección ingresada no pertenece a la ciudad de Cancún");
           setErrorAddress(true);
           setLoading(false);
@@ -146,47 +127,9 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
         </label>
       </div>
       {/* <h2>Ingrese su direccion completa incluyendo calle y despues su numero de casa o apartamento</h2> */}
-      <AddressElement
-        options={{
-          mode: 'shipping',
-          fields: {
-            phone: 'always'
-          },
-          defaultValues: {
-            address: {
-              line1: "",
-              line2: "",
-              city: 'Cancún',
-              country: 'MX',
-              postal_code: '77500',
-              state: 'Q.R.',
-            },
-            phone: '998'
-          },
-        }}
-        onChange={(event) => {
-          const { line1, line2, city } = event.value.address || {};
-          const phoneValue = event.value.phone || '';
-
-          setAddress({
-            line1: line1 || '',
-            line2: line2 || '',
-            city: city || '',
-          });
-
-          setPhone(phoneValue);
-          if (phoneValue.trim() !== '') {
-          setErrorPhone(false); // limpiar error si se corrige
-          }
-
-        }}
-      />
-      
+      <ShippingForm onShippingData={handleShippingForm}/>
       {errorAddress && <p className='text-red-500'>La direccion Ingresada no es de Cancún</p>}
       {/* {errorMessage && <div>{errorMessage}</div>} */}
-      {errorPhone && (
-        <p className="text-red-500">El número de teléfono es obligatorio.</p>
-      )}
       <button
         type="submit"
         disabled={!stripe || loading}
