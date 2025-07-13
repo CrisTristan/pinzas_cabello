@@ -114,7 +114,7 @@ export const ProductsSection = () => {
             </span>
           </p>
           <div className="m-3 flex justify-center items-center">
-            <button
+            {cart.length > 0 &&  <button
               className="bg-peach-primary rounded p-2"
               onClick={() => {
                 if(cart.length === 0) {
@@ -128,7 +128,7 @@ export const ProductsSection = () => {
               }}
             >
               Ir a Pagar
-            </button>
+            </button>}
           </div>
         </div>
       )}

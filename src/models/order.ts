@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
         quantity: { type: Number, default: 1 },
     }],
     total: Number,
-    status: { type: String, enum: ["por entregar", "entregado"], default: "por entregar" },
+    status: { type: String, enum: ["pendiente", "entregado"], default: "pendiente" },
     createdAt: { type: Date, default: Date.now },
     deliveryDate: { type: Date, default: "" }
 })
