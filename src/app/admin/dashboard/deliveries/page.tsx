@@ -8,26 +8,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, MapPin, Clock, CheckCircle, Truck } from "lucide-react"
 import { useEffect, useState } from "react"
 
-const HighPriorityOrders = [];
-
 export default function DeliveriesPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [search, setSearch] = useState("")
-  const [HighPriorityOrders, setHighPriorityOrders] = useState<any[]>([]);
+  const [HighPriorityOrders, setHighPriorityOrders] = useState<any[]>([])
 
   useEffect(() => {
     const fetchOrders = async () => {
-      fetch('/api/orders')
-        .then(res => res.json())
-        .then(data => {
-          setOrders(data)
-        })
-
+      const res = await fetch('/api/orders')
+      const data = await res.json()
+      setOrders(data)
     }
 
     fetchOrders()
   }, [])
-
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -71,6 +65,30 @@ export default function DeliveriesPage() {
         return <Clock className="h-4 w-4" />
     }
   }
+
+  // Filtrar por nombre del cliente
+  const filteredOrders = orders.filter(order =>
+    order.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  // Identificar entregas de alta prioridad
+  useEffect(() => {
+    const hoy = new Date()
+    const dosDiasAntes = new Date()
+    dosDiasAntes.setDate(hoy.getDate() - 2)
+
+    const highPriority = orders.filter(delivery => {
+      const fechaPedido = new Date(delivery.createdAt)
+      const esMismoDia =
+        fechaPedido.getFullYear() === dosDiasAntes.getFullYear() &&
+        fechaPedido.getMonth() === dosDiasAntes.getMonth() &&
+        fechaPedido.getDate() === dosDiasAntes.getDate()
+
+      return delivery.status === 'por entregar' && esMismoDia
+    })
+
+    setHighPriorityOrders(highPriority)
+  }, [orders])
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -139,7 +157,12 @@ export default function DeliveriesPage() {
           <div className="flex items-center space-x-2">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Buscar entregas..." className="pl-8" />
+              <Input
+                placeholder="Buscar entregas..."
+                className="pl-8"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
           </div>
         </CardHeader>
@@ -147,7 +170,6 @@ export default function DeliveriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                {/* <TableHead>Orden</TableHead> */}
                 <TableHead>Cliente</TableHead>
                 <TableHead>Telefono</TableHead>
                 <TableHead>Dirección</TableHead>
@@ -158,13 +180,11 @@ export default function DeliveriesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((delivery) => {
-
-                console.log(delivery.address);
-                const calle = delivery.address.calle;
-                const numero = delivery.address.numero;
-                const colonia = delivery.address.colonia;
-                const codigoPostal = delivery.address.codigoPostal;
+              {filteredOrders.map((delivery) => {
+                const calle = delivery.address.calle
+                const numero = delivery.address.numero
+                const colonia = delivery.address.colonia
+                const codigoPostal = delivery.address.codigoPostal
 
                 const fecha = new Date(delivery.createdAt)
                 const fechaFormateada = fecha.toLocaleDateString("es-MX", {
@@ -178,49 +198,22 @@ export default function DeliveriesPage() {
                   minute: "2-digit"
                 })
 
-                // Fecha actual
-                const hoy = new Date();
-
-                // Fecha dos días antes
-                const dosDiasAntes = new Date();
-                dosDiasAntes.setDate(hoy.getDate() - 2);
-
-                // Filtrar los pedidos
-
-                const fechaPedido = new Date(delivery.createdAt);
-
-                // Comparar solo la fecha, sin la hora
-                const esMismoDia =
-                  fechaPedido.getFullYear() === dosDiasAntes.getFullYear() &&
-                  fechaPedido.getMonth() === dosDiasAntes.getMonth() &&
-                  fechaPedido.getDate() === dosDiasAntes.getDate();
-
-                console.log(esMismoDia);
-
-                if(delivery.status === 'por entregar' && esMismoDia){
-                   HighPriorityOrders.push(delivery)
-                }
-
+                const esAltaPrioridad = HighPriorityOrders.some(p => p._id === delivery._id)
 
                 return (
                   <TableRow key={delivery._id}>
-                    {/* <TableCell className="font-medium">{delivery._id.toString()}</TableCell> */}
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{delivery.name}</div>
-                      </div>
+                      <div className="font-medium">{delivery.name}</div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{delivery.address.telefono}</div>
-                      </div>
+                      <div className="font-medium">{delivery.address.telefono}</div>
                     </TableCell>
                     <TableCell>
                       <div className="max-w-[200px] break-words">
                         <div>{`Calle: ${calle}`}</div>
-                        <div>{`Numero: ${numero}`}</div>
+                        <div>{`Número: ${numero}`}</div>
                         <div>{`Colonia: ${colonia}`}</div>
-                        <div>{`Codigo Potal: ${codigoPostal}`}</div>
+                        <div>{`Código Postal: ${codigoPostal}`}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -230,12 +223,12 @@ export default function DeliveriesPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getPriorityVariant(delivery.priority)}
-                        className={HighPriorityOrders.some(pedido => pedido._id === delivery._id) === true ? "bg-red-300": "bg-green-300"}
-                      >{  
-                        HighPriorityOrders.some(pedido => pedido._id === delivery._id) === true ? "Alta": "Baja"
-                       }
-                       </Badge>
+                      <Badge
+                        variant={getPriorityVariant(delivery.priority)}
+                        className={esAltaPrioridad ? "bg-red-300" : "bg-green-300"}
+                      >
+                        {esAltaPrioridad ? "Alta" : "Baja"}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -250,8 +243,7 @@ export default function DeliveriesPage() {
                     </TableCell>
                   </TableRow>
                 )
-              }
-              )}
+              })}
             </TableBody>
           </Table>
         </CardContent>
