@@ -41,16 +41,16 @@ const items = [
     url: "/admin/dashboard/products",
     icon: Package,
   },
-  {
-    title: "Clientes",
-    url: "/admin/dashboard/customers",
-    icon: Users,
-  },
-  {
-    title: "Reportes",
-    url: "/admin/dashboard/reports",
-    icon: BarChart3,
-  },
+  // {
+  //   title: "Clientes",
+  //   url: "/admin/dashboard/customers",
+  //   icon: Users,
+  // },
+  // {
+  //   title: "Reportes",
+  //   url: "/admin/dashboard/reports",
+  //   icon: BarChart3,
+  // },
 ]
 
 const settingsItems = [
@@ -59,11 +59,11 @@ const settingsItems = [
     url: "/settings",
     icon: Settings,
   },
-  {
-    title: "Soporte",
-    url: "/support",
-    icon: Inbox,
-  },
+  // {
+  //   title: "Soporte",
+  //   url: "/support",
+  //   icon: Inbox,
+  // },
 ]
 
 
@@ -99,7 +99,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Sistema</SidebarGroupLabel>
+          {/* <SidebarGroupLabel>Sistema</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsItems.map((item) => (
@@ -113,11 +113,11 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroupContent>
+          </SidebarGroupContent> */}
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
-        <div className="px-4 py-2 text-sm text-muted-foreground">© 2024 Mi Tienda Online</div>
+        <div className="px-4 py-2 text-sm text-muted-foreground">© ¿Otra? Tienda Online</div>
       </SidebarFooter>
     </Sidebar>
   )

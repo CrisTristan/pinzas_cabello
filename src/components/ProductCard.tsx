@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { Product } from '@/types/product'
 
-export const ProductCard = ({ _id, name, price, image }: Product): React.JSX.Element => {
+export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: Product): React.JSX.Element => {
 
   const [selectedOption, setSelectedOption] = useState('Docena');
 
@@ -76,11 +76,11 @@ export const ProductCard = ({ _id, name, price, image }: Product): React.JSX.Ele
         height={400}
         alt="producto"
       />
-      <p className="text-xl font-bold text-peach-secondary">${selectedOption ==='Docena' ? "200": "30"}</p>
+      <p className="text-xl font-bold text-peach-secondary">${selectedOption ==='Docena' ? docenaPrice: individualPrice}</p>
       <div className="flex gap-3">
         <button
           className="bg-peach-primary rounded p-2 text-md"
-          onClick={() => handleAddToCart({ _id, name, price, image, selectedOption })}
+          onClick={() => handleAddToCart({ _id, name, individualPrice, docenaPrice,image, selectedOption })}
         >
           Añadir al carrito
         </button>

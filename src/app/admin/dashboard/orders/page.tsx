@@ -26,28 +26,34 @@ import { OrderActionsButton } from "@/components/OrderActionsButton"
 export default function OrdersPageClient() {
   const [orders, setOrders] = useState<any[]>([])
   const [search, setSearch] = useState("")
+  const [sortRecentFirst, setSortRecentFirst] = useState(true) // ✅ Estado para ordenar
 
   useEffect(() => {
     const fetchOrders = async () => {
       fetch('/api/orders')
-      .then(res => res.json())
-      .then(data=>{
-        setOrders(data)
-      })
-      
+        .then(res => res.json())
+        .then(data => {
+          setOrders(data)
+        })
     }
 
     fetchOrders()
   }, [])
 
   // 🔍 Filtro por ID o nombre de cliente
-  const filteredOrders = orders.filter((order) => {
-    const searchLower = search.toLowerCase()
-    return (
-      order._id.toString().toLowerCase().startsWith(searchLower) ||
-      order.name.toLowerCase().includes(searchLower)
-    )
-  })
+  const filteredOrders = orders
+    .filter((order) => {
+      const searchLower = search.toLowerCase()
+      return (
+        order._id.toString().toLowerCase().startsWith(searchLower) ||
+        order.name.toLowerCase().includes(searchLower)
+      )
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return sortRecentFirst ? dateB - dateA : dateA - dateB
+    })
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -80,6 +86,12 @@ export default function OrdersPageClient() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <Button
+              variant="outline"
+              onClick={() => setSortRecentFirst(!sortRecentFirst)}
+            >
+              {sortRecentFirst ? "Más recientes" : "Menos recientes"}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -149,4 +161,3 @@ export default function OrdersPageClient() {
     </div>
   )
 }
-

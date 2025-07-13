@@ -138,7 +138,8 @@ export const ProductsSection = () => {
           key= {product._id}
           _id={product._id}
           name={product.name}
-          price={product.price}
+          individualPrice={product.individualPrice}
+          docenaPrice={product.docenaPrice}
           image={product.image}
         />
       ))}

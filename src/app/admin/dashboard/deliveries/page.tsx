@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 export default function DeliveriesPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("Todos")
   const [HighPriorityOrders, setHighPriorityOrders] = useState<any[]>([])
 
   useEffect(() => {
@@ -23,34 +24,6 @@ export default function DeliveriesPage() {
     fetchOrders()
   }, [])
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "Entregada":
-        return "default"
-      case "En ruta":
-        return "secondary"
-      case "Pendiente":
-        return "destructive"
-      case "Programada":
-        return "outline"
-      default:
-        return "outline"
-    }
-  }
-
-  const getPriorityVariant = (priority: string) => {
-    switch (priority) {
-      case "Alta":
-        return "destructive"
-      case "Media":
-        return "secondary"
-      case "Baja":
-        return "outline"
-      default:
-        return "outline"
-    }
-  }
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "Entregada":
@@ -61,17 +34,26 @@ export default function DeliveriesPage() {
         return <Clock className="h-4 w-4" />
       case "Programada":
         return <MapPin className="h-4 w-4" />
+      case "Cancelado":
+        return <Clock className="h-4 w-4 text-red-500" />
       default:
         return <Clock className="h-4 w-4" />
     }
   }
 
-  // Filtrar por nombre del cliente
-  const filteredOrders = orders.filter(order =>
-    order.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Cancelado":
+        return "bg-red-100 text-red-700"
+      case "Entregado":
+        return "bg-green-100 text-green-700"
+      case "por entregar":
+        return "bg-gray-100 text-gray-700"
+      default:
+        return "bg-muted text-muted-foreground"
+    }
+  }
 
-  // Identificar entregas de alta prioridad
   useEffect(() => {
     const hoy = new Date()
     const dosDiasAntes = new Date()
@@ -90,6 +72,13 @@ export default function DeliveriesPage() {
     setHighPriorityOrders(highPriority)
   }, [orders])
 
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.name.toLowerCase().includes(search.toLowerCase())
+    const matchesStatus =
+      statusFilter === "Todos" || order.status.toLowerCase() === statusFilter.toLowerCase()
+    return matchesSearch && matchesStatus
+  })
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -101,53 +90,6 @@ export default function DeliveriesPage() {
           <Truck className="mr-2 h-4 w-4" />
           Nueva Entrega
         </Button>
-      </div>
-
-      {/* Resumen de entregas */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Entregas Hoy</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">2 pendientes, 1 en ruta</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">En Ruta</CardTitle>
-            <Truck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">Ana López - Barcelona</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completadas</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">Carmen Díaz - Bilbao</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Programadas</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground">Para mañana</p>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>
@@ -164,6 +106,16 @@ export default function DeliveriesPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border rounded-md px-3 py-2 text-sm"
+            >
+              <option value="Todos">Todos</option>
+              <option value="Entregado">Entregado</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="por entregar">Por entregar</option>
+            </select>
           </div>
         </CardHeader>
         <CardContent>
@@ -224,16 +176,16 @@ export default function DeliveriesPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={getPriorityVariant(delivery.priority)}
+                        variant="outline"
                         className={esAltaPrioridad ? "bg-red-300" : "bg-green-300"}
                       >
                         {esAltaPrioridad ? "Alta" : "Baja"}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className={`flex items-center gap-2 px-2 py-1 rounded-md ${getStatusColor(delivery.status)}`}>
                         {getStatusIcon(delivery.status)}
-                        <Badge variant={getStatusVariant(delivery.status)}>{delivery.status}</Badge>
+                        <span className="text-sm font-medium">{delivery.status}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">

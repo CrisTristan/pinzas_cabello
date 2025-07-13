@@ -14,7 +14,7 @@ import { Product } from '@/types/product';
 import ShippingForm from './ShippingForm';
 import { set } from 'mongoose';
 
-export const CheckoutForm = ({amount, products}: {amount: number, products: Product}) => {
+export const CheckoutForm = ({amount, products}: {amount: number, products: Product[]}) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -33,7 +33,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       },
       body: JSON.stringify({
         amount: convertToSubcurrency(amount),
-        products: products,
+        products: products.map(({image, name, individualPrice, docenaPrice, price, ...rest})=> rest), //eliminamos la propiedad Imagen
         shippingData: shippingData, 
       }), 
     })
