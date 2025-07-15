@@ -10,11 +10,11 @@ export function OrderSummary({ products }: { products: typeof products }) {
     <div style={{ background: '#fff', borderRadius: 8, padding: 24, maxWidth: 400 }}>
       <h3 style={{ fontWeight: 600, marginBottom: 16 }}>Resumen del pedido</h3>
       {products.map((p) => (
-        <div key={p._id} style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+        <div key={p._id+p.type} style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
           <Image src={p.image} alt={p.name} width={56} height={56} style={{ borderRadius: 8, marginRight: 12 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 500 }}>{p.name}</div>
-            <div className='text-red-500 font-bold'>{p.selectedOption}</div>
+            <div className='text-red-500 font-bold'>{p.type === 'D' ? 'Docena': 'Individual'}</div>
             {p.descripcion && <div style={{ fontSize: 13, color: '#888' }}>{p.descripcion}</div>}
           </div>
           <div style={{ textAlign: 'right', minWidth: 100 }}>

@@ -7,12 +7,29 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, MapPin, Clock, CheckCircle, Truck } from "lucide-react"
 import { useEffect, useState } from "react"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Product } from "@/types/product"
+import Image from "next/image"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { redirect } from "next/navigation"
 
 export default function DeliveriesPage() {
+  //auth check
+  // const {isAuthenticated} = getKindeServerSession();
+  //   if(!(await isAuthenticated())) {
+  //     redirect("/api/auth/login")
+  //   }
+  
   const [orders, setOrders] = useState<any[]>([])
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("Todos")
   const [HighPriorityOrders, setHighPriorityOrders] = useState<any[]>([])
+  const [selectedDeliveryId, setSelectedDeliveryId] = useState<string | null>(null)
+  const [productDetails, setProductDetails] = useState<Record<string, Product[]>>({})
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -23,6 +40,32 @@ export default function DeliveriesPage() {
 
     fetchOrders()
   }, [])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!selectedDeliveryId) return
+      const delivery = orders.find(o => o._id === selectedDeliveryId) //Buscar la orden en la que se hizo click
+      if (!delivery || productDetails[selectedDeliveryId]) return     //devuelve la orden con el id que se hizo click
+
+      const productsFetched: Product[] = await Promise.all(
+        delivery.products.map(async (product: Product) => { //recorremos los productos
+          const res = await fetch(`/api/products?id=${product.productId}`)  //hacemos fetch para obtener los detalles con ese id
+          const data = await res.json()
+          return {
+            ...product,  //desestruturacion product
+            ...data      //desestructuracion de data
+          }
+        })
+      )
+
+      setProductDetails(prev => ({
+        ...prev,
+        [selectedDeliveryId]: productsFetched
+      }))
+    }
+
+    fetchProducts()
+  }, [selectedDeliveryId, orders, productDetails])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -66,7 +109,7 @@ export default function DeliveriesPage() {
         fechaPedido.getMonth() === dosDiasAntes.getMonth() &&
         fechaPedido.getDate() === dosDiasAntes.getDate()
 
-      return delivery.status === 'por entregar' && esMismoDia
+      return delivery.status === 'pendiente' && esMismoDia
     })
 
     setHighPriorityOrders(highPriority)
@@ -112,9 +155,9 @@ export default function DeliveriesPage() {
               className="border rounded-md px-3 py-2 text-sm"
             >
               <option value="Todos">Todos</option>
-              <option value="Entregado">Entregado</option>
-              <option value="Cancelado">Cancelado</option>
-              <option value="por entregar">Por entregar</option>
+              <option value="entregado">entregado</option>
+              <option value="cancelado">cancelado</option>
+              <option value="pendiente">pendiente</option>
             </select>
           </div>
         </CardHeader>
@@ -124,7 +167,7 @@ export default function DeliveriesPage() {
               <TableRow>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Telefono</TableHead>
-                <TableHead>Dirección</TableHead>
+                {/* <TableHead>Dirección</TableHead> */}
                 <TableHead>Fecha y Hora</TableHead>
                 <TableHead>Prioridad</TableHead>
                 <TableHead>Estado</TableHead>
@@ -160,14 +203,14 @@ export default function DeliveriesPage() {
                     <TableCell>
                       <div className="font-medium">{delivery.address.telefono}</div>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <div className="max-w-[200px] break-words">
                         <div>{`Calle: ${calle}`}</div>
                         <div>{`Número: ${numero}`}</div>
                         <div>{`Colonia: ${colonia}`}</div>
                         <div>{`Código Postal: ${codigoPostal}`}</div>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <div>
                         <div className="font-medium">{fechaFormateada}</div>
@@ -189,9 +232,54 @@ export default function DeliveriesPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        <MapPin className="h-4 w-4" />
-                      </Button>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm"
+                            className="bg-blue-500 text-white hover:bg-blue-600"
+                            onClick={() => setSelectedDeliveryId(delivery._id)}
+                          >
+                            Detalles
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] max-h-[500px] overflow-y-auto bg-white shadow-lg rounded-md p-4">
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-lg">Detalles de la entrega</h4>
+                            <p><strong>Cliente:</strong> {delivery.name}</p>
+                            <p><strong>Teléfono:</strong> {delivery.address.telefono}</p>
+                            <p><strong>Dirección:</strong></p>
+                            <ul className="ml-4 list-disc text-sm">
+                              <li>{`Calle: ${calle}`}</li>
+                              <li>{`Número: ${numero}`}</li>
+                              <li>{`Colonia: ${colonia}`}</li>
+                              <li>{`Código Postal: ${codigoPostal}`}</li>
+                            </ul>
+                            <p><strong>Productos a entregar:</strong></p>
+                            {productDetails[delivery._id] ? (
+                              productDetails[delivery._id].map((product) => (
+                                <div key={product._id + (product.type ?? "")}>
+                                  <ul className="ml-4 list-disc text-sm">
+                                    <li>{product.name || "Producto"}</li>
+                                    <li>
+                                      <Image
+                                        src={product.image}
+                                        alt={`Imagen de ${product.name}`}
+                                        width={80}
+                                        height={80}
+                                      />
+                                    </li>
+                                    <li><span>Tipo: </span>{product.type === 'D' ? "Docena": "Individual"}</li>
+                                    <li><span>Cantidad: </span>{product.quantity}</li>
+                                  </ul>
+                                  <p>---------------------------</p>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground">Cargando productos...</p>
+                            )}
+
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </TableCell>
                   </TableRow>
                 )
@@ -202,4 +290,4 @@ export default function DeliveriesPage() {
       </Card>
     </div>
   )
-}
+};

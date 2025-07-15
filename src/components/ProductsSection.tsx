@@ -46,19 +46,19 @@ export const ProductsSection = () => {
     localStorage.setItem('cart', JSON.stringify(newCart));
   };
 
-  const handleIncrease = (id: string) => {
+  const handleIncrease = (id: string, type: string) => {
     const newCart = cart.map(item =>
-      item._id === id
+      item._id === id && item.type === type
         ? { ...item, quantity: (item.quantity || 1) + 1 }
         : item
     );
     updateCart(newCart);
   };
 
-  const handleDecrease = (id: string) => {
+  const handleDecrease = (id: string, type: string) => {
     let newCart = cart
       .map(item =>
-        item._id === id
+        item._id === id && item.type === type
           ? { ...item, quantity: (item.quantity || 1) - 1 }
           : item
       )
@@ -92,17 +92,17 @@ export const ProductsSection = () => {
           ) : (
             <ul>
               {cart.map((item, idx) => (
-                <li key={item._id} className="flex justify-between items-center border-b py-2">
+                <li key={item._id+item.type} className="flex justify-between items-center border-b py-2">
                   <span>{item.name} x <span className="text-red-500 font-bold">{item.quantity || 1}</span></span>
-                  <span>{item.selectedOption}</span>
+                  <span className="text-red-500 font-bold">{item.type === 'D' ? 'Docena': 'Individual'}</span> {/*SelectedOption */}
                   <span>${item.price * (item.quantity || 1)}</span>
                   <button
                     className="bg-gray-200 text-green-300 font-bold p-2"
-                    onClick={() => handleIncrease(item._id)}
+                    onClick={() => handleIncrease(item._id, item.type)}
                   >+</button>
                   <button
                     className="bg-gray-200 text-red-300 font-bold p-2"
-                    onClick={() => handleDecrease(item._id)}
+                    onClick={() => handleDecrease(item._id, item.type)}
                   >-</button>
                 </li>
               ))}

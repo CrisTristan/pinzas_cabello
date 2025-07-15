@@ -138,9 +138,9 @@ export default function OrdersPageClient() {
                       <Badge
                         variant="outline"
                         className={
-                          order.status === "Entregado"
+                          order.status === "entregado"
                             ? "bg-green-300"
-                            : order.status === "Cancelado"
+                            : order.status === "cancelado"
                             ? "bg-red-300"
                             : "bg-gray-200"
                         }

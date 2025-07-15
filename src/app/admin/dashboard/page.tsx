@@ -2,8 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { DollarSign, Package, ShoppingCart, Users, Clock } from "lucide-react"
 import { getAllOrders } from "@/lib/getAllOrders"
+import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
+  //auth check
+
   const orders = await getAllOrders();
 
   console.log("Orders fetched:", orders);

@@ -7,11 +7,11 @@ const schema = new mongoose.Schema({
     address: {nombre: String, telefono: String, calle: String, numero: String, colonia: String, codigoPostal: Number},
     products: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-        selectedOption: { type: String, required: true }, // se guarda como 'type'
+        type: { type: String, enum: ["D", "I"], required: true }, // se guarda como 'type'
         quantity: { type: Number, default: 1 },
     }],
     total: Number,
-    status: { type: String, enum: ["pendiente", "entregado"], default: "pendiente" },
+    status: { type: String, enum: ["pendiente", "entregado", "cancelado"], default: "pendiente" },
     createdAt: { type: Date, default: Date.now },
     deliveryDate: { type: Date, default: "" }
 })

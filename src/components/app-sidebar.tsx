@@ -15,9 +15,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
-import { set } from "mongoose"
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs"
 
 // Menu items.
 const items = [
@@ -68,9 +66,7 @@ const settingsItems = [
 
 
 
-export function AppSidebar() {
-
-  //const [showSideBar, setShowSideBar] = useState(true);
+export function AppSidebar({isLoggedIn}: { isLoggedIn?: boolean}) {
   
   return (
     <Sidebar className="w-64">
@@ -95,6 +91,9 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                {isLoggedIn && <LogoutLink className="w-full bg-blue-500 p-3 rounded-md mt-4">Salir</LogoutLink>}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

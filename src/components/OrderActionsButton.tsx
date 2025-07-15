@@ -59,22 +59,22 @@ export const OrderActionsButton = ({ idOrder }: { idOrder: string }) => {
         <div className="flex flex-col gap-3 mt-2 bg-white shadow-md p-2 rounded-md">
           <p>Marcar como:</p>
           <button
-            onClick={() => handleOrderAction(idOrder, 'Entregado')}
+            onClick={() => handleOrderAction(idOrder, 'entregado')}
             className="bg-green-300 p-2 rounded-md"
           >
             Entregado
           </button>
           <button
-            onClick={() => handleOrderAction(idOrder, 'Cancelado')}
+            onClick={() => handleOrderAction(idOrder, 'cancelado')}
             className="bg-red-300 p-2 rounded-md"
           >
             Cancelado
           </button>
           <button
-            onClick={() => handleOrderAction(idOrder, 'Por entregar')}
+            onClick={() => handleOrderAction(idOrder, 'pendiente')}
             className="bg-gray-200 p-2 rounded-md"
           >
-            Por entregar
+            Pendiente
           </button>
         </div>
       )}

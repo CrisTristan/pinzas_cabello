@@ -30,6 +30,8 @@ export default function CheckoutPage() {
     0
   );
 
+  console.log(amount);
+  
   const deliveryCost = 50; // Costo de envío fijo
   const totalAmount = amount + deliveryCost;
 

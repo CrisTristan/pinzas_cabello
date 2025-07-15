@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         },
         products: products.map((product: any) => ({
           productId: product._id, // <-- cambiar _id a id
-          selectedOption: product.selectedOption, // se guarda como 'type'
+          type: product.type, // se guarda como 'type'
           quantity: product.quantity || 1,
         })),
         total: paymentIntentSucceeded.amount / 100,
