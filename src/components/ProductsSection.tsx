@@ -6,7 +6,7 @@ import { ProductCard } from "../components/ProductCard"
 import React, { useEffect, useState } from "react"
 import { Product } from "@/types/product"
 
-export const ProductsSection = () => {
+export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => {
   const [cart, setCart] = useState<any[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -69,10 +69,15 @@ export const ProductsSection = () => {
   return (
     <div>
       <div className="flex justify-between items-center m-5">
-        <h1>Productos</h1>
+        <h1 className="text-3xl font-extrabold bg-gradient-to-r from-rose-500 via-pink-400 to-yellow-400 bg-clip-text text-transparent drop-shadow-lg tracking-wide">
+          Catálogo de Productos
+        </h1>
         <button
           className="relative bg-peach-primary rounded-full p-3"
-          onClick={() => setShowCart(!showCart)}
+          onClick={() => {
+            setShowCart(!showCart);
+            if (!showCart && onShowCart) onShowCart();
+          }}
           aria-label="Ver carrito"
         >
           {/* Icono de carrito simple */}
@@ -135,8 +140,9 @@ export const ProductsSection = () => {
       <div className="grid grid-cols-1 gap-10 m-5">
         {products.map((product, i) => (
         <ProductCard
-          key= {product._id}
+          key={product._id}
           _id={product._id}
+          productId={product.productId}
           name={product.name}
           individualPrice={product.individualPrice}
           docenaPrice={product.docenaPrice}

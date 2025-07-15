@@ -91,8 +91,8 @@ export function AppSidebar({isLoggedIn}: { isLoggedIn?: boolean}) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
-                {isLoggedIn && <LogoutLink className="w-full bg-blue-500 p-3 rounded-md mt-4">Salir</LogoutLink>}
+              <SidebarMenuItem className="mt-5 flex justify-center items-center">
+                {isLoggedIn && <LogoutLink className="bg-blue-500 p-3 rounded-md mt-4">Salir</LogoutLink>}
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

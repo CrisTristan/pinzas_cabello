@@ -7,71 +7,34 @@ import { Badge } from "@/components/ui/badge"
 import { Star, Sparkles, Heart, ShoppingBag, Truck, Shield, Award, Menu, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
-import logoOtra from "../../public/images/logo_otra.jpg"
+import { useState, useRef } from "react"
+import { ProductsSection } from "./ProductsSection"
 
 export const LandingPage = () => {
+  const productsRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const handleScrollToProducts = (behavior: ScrollBehavior) => {
+    productsRef.current?.scrollIntoView({ behavior });
+  };
+
+  const handleScrollToTestimonials = () => {
+    testimonialsRef.current?.scrollIntoView({ behavior: "instant" });
+  }
+
+  // Scroll para mostrar el carrito si está fuera de vista
+  const handleShowCart = () => {
+    if (productsRef.current) {
+      const rect = productsRef.current.getBoundingClientRect();
+      // Si el top del catálogo está fuera de la ventana visible, haz scroll
+      if (rect.top < 0 || rect.top > window.innerHeight / 3) {
+        productsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-rose-50 to-white">
-      {/* Mobile Header */}
-      <header className="px-4 h-20 flex items-center justify-between border-b bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <Link href="/" className="flex items-center">
-          {/* <Sparkles className="h-7 w-7 text-rose-500" />
-          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
-            BellaPin
-          </span> */}
-          <Image
-            src={logoOtra}
-            width={500}
-            height={500}
-            alt="logo de ¿otra?"
-          />
-        </Link>
-
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-gray-600 hover:text-rose-500">
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-white border-b shadow-lg">
-            <nav className="flex flex-col p-4 space-y-4">
-              <Link
-                href="#productos"
-                className="text-base font-medium text-gray-700 hover:text-rose-500 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Productos
-              </Link>
-              <Link
-                href="#beneficios"
-                className="text-base font-medium text-gray-700 hover:text-rose-500 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Beneficios
-              </Link>
-              <Link
-                href="#testimonios"
-                className="text-base font-medium text-gray-700 hover:text-rose-500 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Testimonios
-              </Link>
-              <Link
-                href="#contacto"
-                className="text-base font-medium text-gray-700 hover:text-rose-500 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contacto
-              </Link>
-            </nav>
-          </div>
-        )}
-      </header>
-
       <main className="flex-1">
         {/* Mobile Hero Section */}
         <section className="w-full py-8 px-4 relative overflow-hidden">
@@ -91,7 +54,7 @@ export const LandingPage = () => {
 
             {/* Hero Content */}
             <div className="space-y-4">
-              <Badge className="bg-rose-100 text-rose-700 text-sm px-3 py-1">✨ Colección Premium 2024</Badge>
+              <Badge className="bg-rose-100 text-rose-700 text-sm px-3 py-1">✨ Colección Premium 2025</Badge>
 
               <h1 className="text-2xl font-bold leading-tight bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent px-2">
                 Pinzas de Cabello que Transforman tu Estilo
@@ -107,14 +70,16 @@ export const LandingPage = () => {
                 <Button
                   size="lg"
                   className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-base py-3"
+                  onClick={handleScrollToTestimonials}
                 >
-                  <ShoppingBag className="mr-2 h-5 w-5" />
-                  Comprar Ahora
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Reseñas
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="w-full border-rose-200 text-rose-600 hover:bg-rose-50 text-base py-3 bg-transparent"
+                  onClick={()=> handleScrollToProducts("smooth")}
                 >
                   Ver Catálogo Completo
                 </Button>
@@ -132,98 +97,10 @@ export const LandingPage = () => {
             </div>
           </div>
         </section>
-
-        {/* Mobile Products Section */}
-        <section id="productos" className="w-full py-12 px-4 bg-white">
-          <div className="text-center space-y-4 mb-8">
-            <Badge className="bg-pink-100 text-pink-700">Productos Destacados</Badge>
-            <h2 className="text-2xl font-bold">Nuestra Colección Premium</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Cada pinza está cuidadosamente diseñada para combinar funcionalidad y elegancia.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {/* Product Card 1 */}
-            <Card className="border-rose-100 shadow-sm">
-              <CardContent className="p-4">
-                <div className="relative mb-4">
-                  <Image
-                    src="https://tse1.mm.bing.net/th/id/OIP.XDF25quZDwCNacHMXo8eOAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
-                    width={300}
-                    height={200}
-                    alt="Pinzas Clásicas Elegantes"
-                    className="rounded-lg w-full h-48 object-cover"
-                  />
-                  <Badge className="absolute top-2 right-2 bg-rose-500 text-white text-xs">Bestseller</Badge>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-lg font-bold">Colección Clásica</h3>
-                  <p className="text-gray-600 text-sm">
-                    Pinzas atemporales con acabados en oro rosa y detalles de perlas.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-rose-600">$24.99</span>
-                    <Button className="bg-rose-500 hover:bg-rose-600 px-6">Agregar</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Product Card 2 */}
-            <Card className="border-rose-100 shadow-sm">
-              <CardContent className="p-4">
-                <div className="relative mb-4">
-                  <Image
-                    src="https://image.hm.com/assets/hm/de/9d/de9dca7eb2f60a59ea786849334a0b2a000ffb56.jpg?imwidth=1260"
-                    width={300}
-                    height={200}
-                    alt="Pinzas Modernas con Cristales"
-                    className="rounded-lg w-full h-48 object-cover"
-                  />
-                  <Badge className="absolute top-2 right-2 bg-pink-500 text-white text-xs">Nuevo</Badge>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-lg font-bold">Colección Cristal</h3>
-                  <p className="text-gray-600 text-sm">
-                    Diseños modernos con cristales Swarovski y acabados brillantes.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-rose-600">$39.99</span>
-                    <Button className="bg-rose-500 hover:bg-rose-600 px-6">Agregar</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Product Card 3 */}
-            <Card className="border-rose-100 shadow-sm">
-              <CardContent className="p-4">
-                <div className="relative mb-4">
-                  <Image
-                    src="https://image.hm.com/assets/hm/f6/eb/f6eb4666bd5bf617cfcd2ce0f8788c2b6b9529f6.jpg?imwidth=1260"
-                    width={300}
-                    height={200}
-                    alt="Pinzas Vintage Artesanales"
-                    className="rounded-lg w-full h-48 object-cover"
-                  />
-                  <Badge className="absolute top-2 right-2 bg-amber-500 text-white text-xs">Limitada</Badge>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-lg font-bold">Colección Vintage</h3>
-                  <p className="text-gray-600 text-sm">
-                    Piezas únicas inspiradas en la elegancia vintage con detalles artesanales.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-rose-600">$49.99</span>
-                    <Button className="bg-rose-500 hover:bg-rose-600 px-6">Agregar</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
+        
+        <div ref={productsRef}>
+          <ProductsSection onShowCart={handleShowCart} />
+        </div>
         {/* Mobile Benefits Section */}
         <section id="beneficios" className="w-full py-12 px-4 bg-gradient-to-br from-rose-50 to-pink-50">
           <div className="text-center space-y-4 mb-8">
@@ -274,6 +151,7 @@ export const LandingPage = () => {
         </section>
 
         {/* Mobile Testimonials */}
+        <div ref={testimonialsRef}>
         <section id="testimonios" className="w-full py-12 px-4 bg-white">
           <div className="text-center space-y-4 mb-8">
             <Badge className="bg-pink-100 text-pink-700">Testimonios</Badge>
@@ -299,7 +177,7 @@ export const LandingPage = () => {
                   <div className="h-10 w-10 rounded-full bg-gradient-to-r from-rose-400 to-pink-400 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-sm">María González</p>
-                    <p className="text-xs text-gray-500">Influencer de Moda</p>
+                    <p className="text-xs text-gray-500">Ama de Casa</p>
                   </div>
                 </div>
               </CardContent>
@@ -348,6 +226,7 @@ export const LandingPage = () => {
             </Card>
           </div>
         </section>
+        </div>
 
         {/* Mobile Services */}
         <section className="w-full py-12 px-4 bg-gradient-to-br from-rose-50 to-pink-50">
@@ -412,7 +291,9 @@ export const LandingPage = () => {
             </div>
 
             <div className="flex flex-col gap-3 pt-4">
-              <Button size="lg" className="w-full bg-white text-rose-600 hover:bg-rose-50 h-12 text-base font-semibold">
+              <Button size="lg" className="w-full bg-white text-rose-600 hover:bg-rose-50 h-12 text-base font-semibold"
+                onClick={()=>handleScrollToProducts("instant")}
+              >
                 <ShoppingBag className="mr-2 h-5 w-5" />
                 Explorar Catálogo
               </Button>
@@ -432,14 +313,20 @@ export const LandingPage = () => {
       <footer className="py-8 px-4 border-t bg-white">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="h-6 w-6 text-rose-500" />
+            <Image
+              src="/images/logo_otra.jpg"
+              width={200}
+              height={200}
+              alt="logo de ¿otra?"
+              className="h-20 w-20 rounded-full"
+            />
             <span className="ml-2 text-lg font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
-              BellaPin
+              ¿Otra?
             </span>
           </div>
 
           <p className="text-xs text-gray-500 leading-relaxed">
-            © 2024 BellaPin. Todos los derechos reservados.
+            © 2024 ¿Otra?. Todos los derechos reservados.
             <br />
             Diseñado con amor para mujeres elegantes.
           </p>

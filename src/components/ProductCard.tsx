@@ -31,7 +31,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
       cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
     } else {
       // Si no existe, agregar con cantidad 1
-      cart.push({ ...product, quantity: 1, price: selectedOption === 'D' ? docenaPrice : individualPrice});
+      cart.push({ ...product, quantity: 1, price: selectedOption === 'D' ? docenaPrice : individualPrice });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
   }
@@ -50,7 +50,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
     <div
       className="bg-peach text-center p-4 rounded-md flex flex-col items-center gap-2"
     >
-      <h2 className="font-bold text-md">{name}</h2>
+      <h2 className="font-bold text-lg text-pink-500">{name}</h2>
       {/* <p>{_id}</p> */}
       <div>
         <label className="mr-4">
@@ -61,7 +61,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
             checked={selectedOption === 'D'}
             onChange={(e)=> handleChange(e, _id)}
           />
-          <span className="ml-2">Docena</span>
+          <span className="ml-2 text-orange-400 font-bold">Docena</span>
         </label>
 
         <label>
@@ -72,7 +72,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
             checked={selectedOption === 'I'}
             onChange={(e)=> handleChange(e, _id)}
           />
-          <span className="ml-2">Individual</span>
+          <span className="ml-2 text-orange-500 font-bold">Individual</span>
         </label>
       </div>
       <Image
@@ -85,7 +85,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
       <div className="flex gap-3">
         <button
           className="bg-peach-primary rounded p-2 text-md"
-          onClick={() => handleAddToCart({ _id, name, individualPrice, docenaPrice,image, type: selectedOption })}
+          onClick={() => handleAddToCart({ productId: _id, _id, name, individualPrice, docenaPrice, image, type: selectedOption })}
         >
           Añadir al carrito
         </button>

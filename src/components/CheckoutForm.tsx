@@ -25,22 +25,6 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
   const [errorAddress, setErrorAddress] = useState<boolean>(false);
   const [shippingData, setShippingData] = useState<any>(null);
 
-  useEffect(() => {
-    fetch('/api/create-payment-intent', { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: convertToSubcurrency(amount),
-        products: products.map(({image, name, individualPrice, docenaPrice, price, ...rest})=> rest), //eliminamos la propiedad Imagen
-        shippingData: shippingData, 
-      }), 
-    })
-    .then(res => res.json())
-    .then(data => setClientSecret(data.clientSecret));
-  }, [amount, shippingData]);
-
   const handleShippingForm = (shippingData: any) => {
     //console.log("Datos de envío recibidos desde el componente hijo:", shippingData);
     //Actualizamos el estado shippingData solo si todos los campos están completos
@@ -73,16 +57,14 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       return;
     }
 
-    const SearchForAddress = address; //-----------------------------------
+    const SearchForAddress = address;
     const resultado = SearchForAddress.replace(/ /g, "+");
     try {
       const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${resultado}&key=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_API_KEY}`);
       const data = await res.json();
-      console.log("Respuesta de la API de Google Maps:", data);
       const city = data.results[0]?.address_components[1]?.long_name;
       const city2= data.results[0]?.address_components[2]?.long_name;
 
-      console.log("Ciudad encontrada:", city);
       if((city !== 'Cancún') && (city2 !== 'Cancún')){
           toast.error("La dirección ingresada no pertenece a la ciudad de Cancún");
           setErrorAddress(true);
@@ -90,32 +72,52 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
           return;
       }
     } catch (error) {
-      console.log(error);
       setLoading(false);
       return;
     }
 
-    // ...continúa solo si la dirección es válida...
+    // Aquí llamas a tu API para obtener el clientSecret
+    try {
+      const paymentIntentRes = await fetch('/api/create-payment-intent', { 
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: convertToSubcurrency(amount),
+          products: products.map(({image, name, individualPrice, docenaPrice, price, ...rest})=> rest),
+          shippingData: shippingData, 
+        }), 
+      });
+      const paymentIntentData = await paymentIntentRes.json();
+      setClientSecret(paymentIntentData.clientSecret);
 
-    const {error} = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: "http://localhost:3000/success", // Cambia esto a tu URL de éxito
-      },
-    });
+      // Espera a que el estado se actualice antes de continuar
+      // O usa directamente paymentIntentData.clientSecret aquí:
+      const {error, paymentIntent} = await stripe.confirmPayment({
+        elements,
+        clientSecret: paymentIntentData.clientSecret,
+        confirmParams: {
+          return_url: "http://localhost:3000/success",
+        },
+        redirect: "if_required", // Importante: solo redirige si es necesario
+      });
 
-    if(error) {
-      setErrorMessage(error.message);
-    }else{
+      if (error) {
+        setErrorMessage(error.message);
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
         toast.success("Pago realizado con éxito");
+        window.location.href = "http://localhost:3000/success";
+      }
+      // Si el pago requiere redirección, Stripe lo hará automáticamente y este código no se ejecutará
+    } catch (error) {
+      setErrorMessage("Error al procesar el pago.");
     }
 
     setLoading(false);
-    
   };
 
-  if(!clientSecret || !stripe || !elements) {
+  if(!stripe || !elements) {
     return <div>Cargando...</div>;
   }
 
@@ -123,7 +125,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
    <>
     <Toaster position="top-center" />
     <form onSubmit={handleSubmit}>
-     {clientSecret && <PaymentElement/>}
+     <PaymentElement/>
       <h2>Dirección de Envío</h2>
       <div>
         <label>
