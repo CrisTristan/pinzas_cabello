@@ -34,7 +34,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
     }
     const { neighborhood } = shippingData;
     //console.log("Vecindario:", neighborhood);
-    setAddress(neighborhood+" Cancún");
+    setAddress(neighborhood);
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,25 +57,26 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       return;
     }
 
-    const SearchForAddress = address;
-    const resultado = SearchForAddress.replace(/ /g, "+");
-    try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${resultado}&key=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_API_KEY}`);
-      const data = await res.json();
-      console.log("Datos de la dirección:", data);
-      const city = data.results[0]?.address_components[1]?.long_name;
-      const city2= data.results[0]?.address_components[2]?.long_name;
+    //COdigo comentado para buscar la dirección en Google Maps
+    // const SearchForAddress = address;
+    // const resultado = SearchForAddress.replace(/ /g, "+");
+    // try {
+    //   const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${resultado}&key=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_API_KEY}`);
+    //   const data = await res.json();
+    //   console.log("Datos de la dirección:", data);
+    //   const city = data.results[0]?.address_components[1]?.long_name;
+    //   const city2= data.results[0]?.address_components[2]?.long_name;
 
-      if((city !== 'Cancún') && (city2 !== 'Cancún')){
-          toast.error("La colonia o barrio ingresado no pertenece a la ciudad de Cancún");
-          setErrorAddress(true);
-          setLoading(false);
-          return;
-      }
-    } catch (error) {
-      setLoading(false);
-      return;
-    }
+    //   if((city !== 'Cancún') && (city2 !== 'Cancún')){
+    //       toast.error("La colonia o barrio ingresado no pertenece a la ciudad de Cancún");
+    //       setErrorAddress(true);
+    //       setLoading(false);
+    //       return;
+    //   }
+    // } catch (error) {
+    //   setLoading(false);
+    //   return;
+    // }
 
     // Aquí llamas a tu API para obtener el clientSecret
     try {
