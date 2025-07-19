@@ -66,7 +66,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       const city2= data.results[0]?.address_components[2]?.long_name;
 
       if((city !== 'Cancún') && (city2 !== 'Cancún')){
-          toast.error("La dirección ingresada no pertenece a la ciudad de Cancún");
+          toast.error("La colonia o barrio ingresado no pertenece a la ciudad de Cancún");
           setErrorAddress(true);
           setLoading(false);
           return;
@@ -134,7 +134,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
       </div>
       {/* <h2>Ingrese su direccion completa incluyendo calle y despues su numero de casa o apartamento</h2> */}
       <ShippingForm onShippingData={handleShippingForm}/>
-      {errorAddress && <p className='text-red-500'>La direccion Ingresada no es de Cancún</p>}
+      {errorAddress && <p className='text-red-500'>La colonia o barrio Ingresado no es de Cancún</p>}
       {/* {errorMessage && <div>{errorMessage}</div>} */}
       <button
         type="submit"

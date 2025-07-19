@@ -33,7 +33,7 @@ export const NavBar = () => {
                     <div className="absolute top-16 left-0 right-0 bg-white border-b shadow-lg">
                         <nav className="flex flex-col p-4 space-y-4">
                             <Link
-                                href="/#productos"
+                                href="#productos"
                                 className="text-base font-medium text-gray-700 hover:text-rose-500 py-2"
                                 onClick={() => setIsMenuOpen(false)}
                             >

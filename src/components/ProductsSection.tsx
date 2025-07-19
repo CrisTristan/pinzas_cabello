@@ -102,11 +102,11 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
                   <span className="text-red-500 font-bold">{item.type === 'D' ? 'Docena': 'Individual'}</span> {/*SelectedOption */}
                   <span>${item.price * (item.quantity || 1)}</span>
                   <button
-                    className="bg-gray-200 text-green-300 font-bold p-2"
+                    className="bg-gray-200 text-green-500 font-bold p-2 text-xl"
                     onClick={() => handleIncrease(item._id, item.type)}
                   >+</button>
                   <button
-                    className="bg-gray-200 text-red-300 font-bold p-2"
+                    className="bg-gray-200 text-red-500 font-bold p-2 px-3 text-xl"
                     onClick={() => handleDecrease(item._id, item.type)}
                   >-</button>
                 </li>

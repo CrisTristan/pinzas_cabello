@@ -50,8 +50,8 @@ export default function OrdersPageClient() {
       )
     })
     .sort((a, b) => {
-      const dateA = new Date(a.createdAt).getDate()
-      const dateB = new Date(b.createdAt).getDate()
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
       return sortRecentFirst ? dateB - dateA : dateA - dateB
     })
 

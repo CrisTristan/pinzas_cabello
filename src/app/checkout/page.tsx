@@ -8,15 +8,11 @@ import convertToSubcurrency from '@/lib/convertToSubcurrency';
 import { CheckoutForm } from '@/components/CheckoutForm';
 import { OrderSummary } from '@/components/OrderSummary';
 import { useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   let products = [];
   try {
     const cartParam = searchParams.get('cart');
@@ -47,7 +43,6 @@ export default function CheckoutPage() {
       currency: 'mxn',
       }}
     >
-      <Button className="bg-blue-300" onClick={() => router.back()}><ArrowLeft/>Volver</Button>
       <OrderSummary products={products} />
       <CheckoutForm amount={totalAmount} products={products}/>
     </Elements>
