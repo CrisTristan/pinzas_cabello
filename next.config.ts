@@ -8,10 +8,11 @@ const nextConfig: NextConfig = {
       new URL('https://image.hm.com/assets/hm/de/9d/de9dca7eb2f60a59ea786849334a0b2a000ffb56.jpg?imwidth=1260'),
       new URL('https://image.hm.com/assets/hm/f6/eb/f6eb4666bd5bf617cfcd2ce0f8788c2b6b9529f6.jpg?imwidth=1260'),
       new URL('https://tigocolombia.vteximg.com.br/arquivos/ids/155801-1200-1200/Iphone-frontal.png?v=636610430723600000'),
-      
-      ],
-      domains: [
-        "res.cloudinary.com"
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      }
       ]
     },
   };

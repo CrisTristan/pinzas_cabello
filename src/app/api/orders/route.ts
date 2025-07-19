@@ -68,3 +68,29 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Error del servidor' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  await connectDB();
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'Falta el parámetro id' }, { status: 400 });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+  }
+
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(id);
+    if (!deletedOrder) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    }
+    return NextResponse.json({ message: 'Orden eliminada correctamente' }, { status: 200 });
+  } catch (error) {
+    console.error('Error al eliminar la orden:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+  }
+}

@@ -50,8 +50,8 @@ export default function OrdersPageClient() {
       )
     })
     .sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
+      const dateA = new Date(a.createdAt).getDate()
+      const dateB = new Date(b.createdAt).getDate()
       return sortRecentFirst ? dateB - dateA : dateA - dateB
     })
 
@@ -132,7 +132,7 @@ export default function OrdersPageClient() {
                     <TableCell>{fechaFormateada}</TableCell>
                     <TableCell>{order.products.length}</TableCell>
                     <TableCell className="font-medium">
-                      {order.total - 50}
+                      $ {order.total - 50}
                     </TableCell>
                     <TableCell>
                       <Badge

@@ -50,17 +50,15 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { name, stock, individualPrice, docenaPrice } = body
+    const { name, stockDocena, stockIndividual, individualPrice, docenaPrice } = body
 
-    console.log(stock);
-    console.log(typeof stock)
     console.log(individualPrice);
     console.log(typeof individualPrice)
     console.log(docenaPrice)
     console.log(typeof docenaPrice)
 
 
-    if (typeof stock !== "number" || stock < 0) {
+    if (typeof stockDocena !== "number" || stockDocena < 0) {
       return NextResponse.json({ error: "Stock inválido" }, { status: 400 })
     }
 
@@ -70,7 +68,7 @@ export async function PUT(req: NextRequest) {
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
-      { name, stock, individualPrice, docenaPrice },
+      { name, stockDocena, stockIndividual, individualPrice, docenaPrice },
       { new: true }
     )
     

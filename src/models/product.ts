@@ -7,7 +7,8 @@ const schema = new mongoose.Schema({
     individualPrice: Number,
     docenaPrice: Number,
     description: String,
-    stock: Number
+    stockDocena: Number,
+    stockIndividual: Number,
 })
 
 export default mongoose.models.Product || mongoose.model("Product", schema);

@@ -98,7 +98,7 @@ export const LandingPage = () => {
           </div>
         </section>
         
-        <div ref={productsRef}>
+        <div ref={productsRef} id="productos">
           <ProductsSection onShowCart={handleShowCart} />
         </div>
         {/* Mobile Benefits Section */}
@@ -231,7 +231,7 @@ export const LandingPage = () => {
         {/* Mobile Services */}
         <section className="w-full py-12 px-4 bg-gradient-to-br from-rose-50 to-pink-50">
           <div className="space-y-6">
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+            {/* <div className="text-center p-6 bg-white rounded-lg shadow-sm">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 mx-auto mb-4">
                 <Truck className="h-8 w-8 text-rose-600" />
               </div>
@@ -239,7 +239,7 @@ export const LandingPage = () => {
               <p className="text-gray-600 text-sm">
                 Envío gratuito en pedidos superiores a $50. Entrega rápida y segura a todo el estado.
               </p>
-            </div>
+            </div> */}
 
             <div className="text-center p-6 bg-white rounded-lg shadow-sm">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 mx-auto mb-4">
@@ -273,7 +273,7 @@ export const LandingPage = () => {
               </p>
             </div>
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="space-y-3">
                 <Input
                   type="email"
@@ -288,7 +288,7 @@ export const LandingPage = () => {
               <p className="text-xs text-rose-200 leading-relaxed">
                 Recibe un 15% de descuento en tu primera compra y ofertas exclusivas.
               </p>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-3 pt-4">
               <Button size="lg" className="w-full bg-white text-rose-600 hover:bg-rose-50 h-12 text-base font-semibold"
@@ -341,9 +341,9 @@ export const LandingPage = () => {
             <Link href="/shipping" className="text-xs text-gray-500 hover:text-rose-500">
               Envíos
             </Link>
-            <Link href="/returns" className="text-xs text-gray-500 hover:text-rose-500">
+            {/* <Link href="/returns" className="text-xs text-gray-500 hover:text-rose-500">
               Devoluciones
-            </Link>
+            </Link> */}
           </div>
         </div>
       </footer>

@@ -120,7 +120,7 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
 
       {/* Número */}
       <div className="mb-4">
-        <label className="block font-medium">Número</label>
+        <label className="block font-medium">Número de casa / Apartamento</label>
         <input
           type="text"
           name="number"

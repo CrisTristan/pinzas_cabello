@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { Product } from '@/types/product'
 
-export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: Product): React.JSX.Element => {
+export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image, stockDocena, stockIndividual }: Product): React.JSX.Element => {
 
   const [selectedOption, setSelectedOption] = useState('D');
 
@@ -81,6 +81,16 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image }: 
         height={400}
         alt="producto"
       />
+      {
+        selectedOption === 'D' ? (
+        <p className='text-red-500'>{(stockDocena ?? 0) <= 5 ? "Casi agotado" : (stockDocena ?? 0) === 0 ? "agotado" : ""}
+        </p>
+        ) : (
+        <p className='text-red-500'>{(stockIndividual ?? 0) <= 5 ? "Casi agotado" : (stockIndividual ?? 0) === 0 ? "agotado" : ""}
+        </p>
+        )
+      }
+      
       <p className="text-xl font-bold text-peach-secondary">${selectedOption ==='D' ? docenaPrice: individualPrice}</p>
       <div className="flex gap-3">
         <button

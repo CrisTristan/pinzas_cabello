@@ -51,7 +51,24 @@ export async function POST(request: Request) {
       // Parsear productos y dirección
       const products = JSON.parse(metadata.productos);
       const shippingData = JSON.parse(metadata.shippingData);
-
+      console.log("Productos comprados:", products);
+      // Actualizar el stock de los productos
+      for (const product of products) {
+        const { productId, type, quantity } = product;
+        // Restar la cantidad comprada al stock correspondiente
+        if (type === 'D') {
+          await mongoose.model('Product').findByIdAndUpdate(
+            productId,
+            { $inc: { stockDocena: -Math.abs(quantity) } }
+          );
+        } else if (type === 'I') {
+          await mongoose.model('Product').findByIdAndUpdate(
+            productId,
+            { $inc: { stockIndividual: -Math.abs(quantity) } }
+          );
+        }
+      }
+      
       const order = {
         id: paymentIntentSucceeded.id,
         name: shippingData.fullName,

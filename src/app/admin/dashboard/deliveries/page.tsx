@@ -69,16 +69,16 @@ export default function DeliveriesPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "Entregada":
-        return <CheckCircle className="h-4 w-4" />
+      case "entregado":
+        return <CheckCircle className="h-6 w-6 text-green-400" />
       case "En ruta":
         return <Truck className="h-4 w-4" />
-      case "Pendiente":
-        return <Clock className="h-4 w-4" />
+      case "pendiente":
+        return <Clock className="h-6 w-6 text-blue-400" />
       case "Programada":
         return <MapPin className="h-4 w-4" />
-      case "Cancelado":
-        return <Clock className="h-4 w-4 text-red-500" />
+      case "cancelado":
+        return <Clock className="h-6 w-6 text-red-500" />
       default:
         return <Clock className="h-4 w-4" />
     }
@@ -115,12 +115,17 @@ export default function DeliveriesPage() {
     setHighPriorityOrders(highPriority)
   }, [orders])
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.name.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus =
-      statusFilter === "Todos" || order.status.toLowerCase() === statusFilter.toLowerCase()
-    return matchesSearch && matchesStatus
-  })
+  const filteredOrders = orders
+    .filter(order => {
+      const matchesSearch = order.name.toLowerCase().includes(search.toLowerCase())
+      const matchesStatus =
+        statusFilter === "Todos" || order.status.toLowerCase() === statusFilter.toLowerCase()
+      return matchesSearch && matchesStatus
+    })
+    .sort((a, b) => {
+      // Ordena por fecha descendente (más recientes primero)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -195,6 +200,15 @@ export default function DeliveriesPage() {
 
                 const esAltaPrioridad = HighPriorityOrders.some(p => p._id === delivery._id)
 
+                // Calcular prioridad: "alta" si tiene 2 o más días de retraso, "baja" de lo contrario
+                const fechaCreacion = new Date(delivery.createdAt);
+                const hoy = new Date();
+                // Diferencia en milisegundos
+                const diffMs = hoy.getTime() - fechaCreacion.getTime();
+                // Diferencia en días
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const prioridad = diffDays >= 2 ? "Alta" : "Baja";
+
                 return (
                   <TableRow key={delivery._id}>
                     <TableCell>
@@ -220,9 +234,9 @@ export default function DeliveriesPage() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={esAltaPrioridad ? "bg-red-300" : "bg-green-300"}
+                        className={prioridad === "Alta" ? "bg-red-300" : "bg-green-300"}
                       >
-                        {esAltaPrioridad ? "Alta" : "Baja"}
+                        {prioridad}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -276,7 +290,22 @@ export default function DeliveriesPage() {
                             ) : (
                               <p className="text-sm text-muted-foreground">Cargando productos...</p>
                             )}
-
+                            {/* Botón eliminar solo si status es entregado */}
+                            {delivery.status === "entregado" && (
+                              <button
+                                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full"
+                                onClick={async () => {
+                                  if (confirm("¿Seguro que deseas eliminar esta entrega?")) {
+                                    await fetch(`/api/orders?id=${delivery._id}`, {
+                                      method: "DELETE",
+                                    });
+                                    window.location.reload();
+                                  }
+                                }}
+                              >
+                                Eliminar Entrega
+                              </button>
+                            )}
                           </div>
                         </PopoverContent>
                       </Popover>

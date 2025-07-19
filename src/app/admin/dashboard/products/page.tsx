@@ -14,7 +14,8 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("")
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
   const [newName, setNewName] = useState("")
-  const [newStock, setNewStock] = useState("")
+  const [newStockDocena, setNewStockDocena] = useState("")
+  const [newStockIndividual, setNewStockIndividual] = useState("")
   const [newIndividualPrice, setNewIndividualPrice] = useState("")
   const [newDocenaPrice, setNewDocenaPrice] = useState("")
   const [productToDelete, setProductToDelete] = useState<any | null>(null)
@@ -63,7 +64,8 @@ export default function ProductsPage() {
       },
       body: JSON.stringify({
         name: newName,
-        stock: parseInt(newStock),
+        stockIndividual: parseInt(newStockIndividual),
+        stockDocena: parseInt(newStockDocena),
         individualPrice: parseInt(newIndividualPrice),
         docenaPrice: parseInt(newDocenaPrice)
       })
@@ -73,7 +75,8 @@ export default function ProductsPage() {
      await fetchProducts()
       setSelectedProduct(null)
       setNewName("")
-      setNewStock("")
+      setNewStockDocena("")
+      setNewStockIndividual("")
       setNewIndividualPrice("")
       setNewDocenaPrice("")
     } else {
@@ -123,15 +126,18 @@ export default function ProductsPage() {
                 <TableHead>Producto</TableHead>
                 <TableHead><div className="flex flex-col"><p>Precio</p><p>Individual</p></div></TableHead>
                 <TableHead><div className="flex flex-col"><p>Precio</p><p>Docena</p></div></TableHead>
-                <TableHead>Stock</TableHead>
+                <TableHead>Stock Individual</TableHead>
+                <TableHead>Stock Docena</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProducts.map((product) => {
-                const stockStatus = getStockStatus(product.stock)
-                const statusColor = getStatusColor(stockStatus)
+                const stockStatusDocena = getStockStatus(product.stockDocena)
+                const stockStatusIndividual = getStockStatus(product.stockIndividual)
+                const statusColorIndividual = getStatusColor(stockStatusIndividual)
+                const statusColorDocena = getStatusColor(stockStatusDocena)
 
                 return (
                   <TableRow key={product._id}>
@@ -147,12 +153,13 @@ export default function ProductsPage() {
                         <div className="font-medium">{product.name}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{product.individualPrice}</TableCell>
-                    <TableCell className="font-medium">{product.docenaPrice}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
+                    <TableCell className="font-medium">$ {product.individualPrice}</TableCell>
+                    <TableCell className="font-medium">$ {product.docenaPrice}</TableCell>
+                    <TableCell>{product.stockIndividual}</TableCell>
+                    <TableCell>{product.stockDocena}</TableCell>
                     <TableCell>
-                      <div className={`px-2 py-1 rounded-md text-sm font-medium ${statusColor}`}>
-                        {stockStatus}
+                      <div className={`px-2 py-1 rounded-md text-sm font-medium ${statusColorDocena}`}>
+                        {stockStatusDocena}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -160,15 +167,16 @@ export default function ProductsPage() {
                         <Button variant="ghost" size="sm" onClick={() => {
                           setSelectedProduct(product)
                           setNewName(product.name)
-                          setNewStock(product.stock.toString())
+                          setNewStockDocena(product.stockDocena.toString())
+                          setNewStockIndividual(product.stockIndividual.toString())
                           setNewIndividualPrice(product.individualPrice)
                           setNewDocenaPrice(product.docenaPrice)
                         }}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setProductToDelete(product)}>
+                        {/* <Button variant="ghost" size="sm" onClick={() => setProductToDelete(product)}>
                           <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -200,11 +208,20 @@ export default function ProductsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Nuevo stock</label>
+            <label className="block text-sm font-medium mb-1">Nuevo stock Individual</label>
             <Input
               type="number"
-              value={newStock}
-              onChange={(e) => setNewStock(e.target.value)}
+              value={newStockIndividual}
+              onChange={(e) => setNewStockIndividual(e.target.value)}
+              placeholder="Ej. 20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Nuevo stock Docena</label>
+            <Input
+              type="number"
+              value={newStockDocena}
+              onChange={(e) => setNewStockDocena(e.target.value)}
               placeholder="Ej. 20"
             />
           </div>

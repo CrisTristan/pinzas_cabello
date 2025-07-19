@@ -15,7 +15,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
     fetch("/api/products")
     .then(res => res.json())
     .then(data => {
-      // console.log("Productos cargados:", data);
+      console.log("Productos cargados:", data);
       setProducts(data);
     })
 
@@ -147,6 +147,8 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
           individualPrice={product.individualPrice}
           docenaPrice={product.docenaPrice}
           image={product.image}
+          stockDocena={product.stockDocena}
+          stockIndividual={product.stockIndividual}
         />
       ))}
       </div>
