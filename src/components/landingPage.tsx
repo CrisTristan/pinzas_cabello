@@ -33,6 +33,16 @@ export const LandingPage = () => {
     }
   };
 
+  // Obtener el número de WhatsApp desde la variable de entorno
+  const whatsappNumber = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
+
+  const handleContactAdvisor = () => {
+    if (!whatsappNumber) return;
+    // Elimina cualquier caracter no numérico por seguridad
+    const phone = whatsappNumber.replace(/\D/g, "");
+    window.open(`https://wa.me/${phone}`, "_blank");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-rose-50 to-white">
       <main className="flex-1">
@@ -301,6 +311,7 @@ export const LandingPage = () => {
                 variant="outline"
                 size="lg"
                 className="w-full border-white text-white hover:bg-white/10 bg-transparent h-12 text-base"
+                onClick={handleContactAdvisor}
               >
                 Contactar Asesor
               </Button>
