@@ -21,7 +21,7 @@ const shippingSchema = z.object({
 });
 
 type ShippingFormProps = {
-  onShippingData: (data: any) => void;
+  onShippingData: (data: any, errors: any) => void;
 };
 
 export default function ShippingForm({onShippingData}: ShippingFormProps) {
@@ -39,7 +39,7 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
 
   useEffect(() => {
     if(formData.fullName && formData.phone && formData.street && formData.number && formData.neighborhood && formData.postalCode) {
-      onShippingData(formData);
+      onShippingData(formData, errors);
     }
 
     handleShippingSubmit();

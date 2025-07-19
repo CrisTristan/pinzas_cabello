@@ -24,8 +24,9 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<boolean>(false);
   const [shippingData, setShippingData] = useState<any>(null);
+  const [errorsOnShippingForm, setErrorsOnShippingForm] = useState<Record<string, string>>({});
 
-  const handleShippingForm = (shippingData: any) => {
+  const handleShippingForm = (shippingData: any, errors: any) => {
     //console.log("Datos de envío recibidos desde el componente hijo:", shippingData);
     //Actualizamos el estado shippingData solo si todos los campos están completos
     if(shippingData.fullName && shippingData.phone && shippingData.street && shippingData.number && shippingData.neighborhood && shippingData.postalCode) {
@@ -35,6 +36,13 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
     const { neighborhood } = shippingData;
     //console.log("Vecindario:", neighborhood);
     setAddress(neighborhood);
+    if(errors && Object.keys(errors).length > 0) {
+      // toast.error(errors);
+      console.log("Errores en el formulario de envío:", errors);
+      setErrorsOnShippingForm(errors);
+      return;
+    }
+    setErrorsOnShippingForm({});
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,6 +61,12 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
 
     if(!shippingData || !shippingData.fullName || !shippingData.phone || !shippingData.street || !shippingData.number || !shippingData.neighborhood || !shippingData.postalCode) {
       toast.error("Por favor, completa todos los campos de envío.");
+      setLoading(false);
+      return;
+    }
+
+    if(errorsOnShippingForm && Object.keys(errorsOnShippingForm).length > 0) {
+      toast.error("Por favor, corrige los errores en el formulario de envío.");
       setLoading(false);
       return;
     }
