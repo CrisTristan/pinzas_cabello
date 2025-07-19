@@ -38,13 +38,24 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if(formData.fullName && formData.phone && formData.street && formData.number && formData.neighborhood && formData.postalCode) {
-      onShippingData(formData, errors);
-    }
+  const result = shippingSchema.safeParse(formData);
 
-    handleShippingSubmit();
-    
-  },[formData]);
+  if (!result.success) {
+    const fieldErrors: Record<string, string> = {};
+    result.error.issues.forEach(issue => {
+      const field = issue.path[0];
+      if (field) {
+        fieldErrors[field as string] = issue.message;
+      }
+    });
+    setErrors(fieldErrors);
+    onShippingData(formData, fieldErrors); // enviar datos y errores
+    return;
+  }
+
+  setErrors({});
+  onShippingData(formData, {}); // sin errores
+}, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
