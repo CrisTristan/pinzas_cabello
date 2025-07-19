@@ -67,23 +67,27 @@ export default async function DashboardPage() {
             <CardDescription>Últimas 5 compras realizadas</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {orders.slice(-5).map((order) => (
-              <div key={order._id} className="flex items-center">
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">{order.name}</p>
-                  <p className="text-sm text-muted-foreground">{order._id.toString()}</p>
+            {orders
+              .slice()
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 5)
+              .map((order) => (
+                <div key={order._id} className="flex items-center">
+                  <div className="ml-4 space-y-1">
+                    <p className="text-sm font-medium leading-none">{order.name}</p>
+                    <p className="text-sm text-muted-foreground">{order._id.toString()}</p>
+                  </div>
+                  <div className="ml-auto font-medium">$ {order.total-50}</div>
+                  <Badge
+                    variant={
+                      order.status === "entregado" ? "default" : order.status === "pendiente" ? "secondary" : "outline"
+                    }
+                    className="ml-2"
+                  >
+                    {order.status}
+                  </Badge>
                 </div>
-                <div className="ml-auto font-medium">$ {order.total-50}</div>
-                <Badge
-                  variant={
-                    order.status === "entregado" ? "default" : order.status === "pendiente" ? "secondary" : "outline"
-                  }
-                  className="ml-2"
-                >
-                  {order.status}
-                </Badge>
-              </div>
-            ))}
+              ))}
           </CardContent>
         </Card>
 
