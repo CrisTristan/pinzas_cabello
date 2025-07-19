@@ -83,19 +83,38 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image, st
       />
       {
         selectedOption === 'D' ? (
-        <p className='text-red-500'>{(stockDocena ?? 0) <= 5 ? "Casi agotado" : (stockDocena ?? 0) === 0 ? "agotado" : ""}
-        </p>
+          <p className='text-red-500 text-xl'>
+            {(stockDocena ?? 0) === 0
+              ? "agotado"
+              : (stockDocena ?? 0) <= 5
+                ? "Casi agotado"
+                : ""}
+          </p>
         ) : (
-        <p className='text-red-500'>{(stockIndividual ?? 0) <= 5 ? "Casi agotado" : (stockIndividual ?? 0) === 0 ? "agotado" : ""}
-        </p>
+          <p className='text-red-500 text-xl'>
+            {(stockIndividual ?? 0) === 0
+              ? "agotado"
+              : (stockIndividual ?? 0) <= 5
+                ? "Casi agotado"
+                : ""}
+          </p>
         )
       }
       
       <p className="text-xl font-bold text-peach-secondary">${selectedOption ==='D' ? docenaPrice: individualPrice}</p>
       <div className="flex gap-3">
         <button
-          className="bg-peach-primary rounded p-2 text-md"
+          className={`bg-peach-primary rounded p-2 text-md transition-opacity ${
+            ((selectedOption === 'D' && (stockDocena ?? 0) === 0) ||
+              (selectedOption === 'I' && (stockIndividual ?? 0) === 0))
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
           onClick={() => handleAddToCart({ productId: _id, _id, name, individualPrice, docenaPrice, image, type: selectedOption })}
+          disabled={
+            (selectedOption === 'D' && (stockDocena ?? 0) === 0) ||
+            (selectedOption === 'I' && (stockIndividual ?? 0) === 0)
+          }
         >
           Añadir al carrito
         </button>
