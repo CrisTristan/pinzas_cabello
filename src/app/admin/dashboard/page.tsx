@@ -10,7 +10,7 @@ export default async function DashboardPage() {
 
   const orders = await getAllOrders();
 
-  console.log("Orders fetched:", orders);
+  //console.log("Orders fetched:", orders);
   const totalSales = orders.reduce((sum, order) => (sum + order.total - 50), 0);
   
   const pendingDeliveries = orders.reduce((acc: number, order)=>{

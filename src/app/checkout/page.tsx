@@ -8,10 +8,11 @@ import convertToSubcurrency from '@/lib/convertToSubcurrency';
 import { CheckoutForm } from '@/components/CheckoutForm';
 import { OrderSummary } from '@/components/OrderSummary';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const searchParams = useSearchParams();
   let products = [];
   try {
@@ -46,5 +47,13 @@ export default function CheckoutPage() {
       <OrderSummary products={products} />
       <CheckoutForm amount={totalAmount} products={products}/>
     </Elements>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
