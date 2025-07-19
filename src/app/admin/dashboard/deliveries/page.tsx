@@ -117,10 +117,12 @@ export default function DeliveriesPage() {
 
   const filteredOrders = orders
     .filter(order => {
-      const matchesSearch = order.name.toLowerCase().includes(search.toLowerCase())
+      const searchLower = search.toLowerCase();
+      const matchesName = order.name.toLowerCase().includes(searchLower);
+      const matchesId = order._id?.toString().toLowerCase().includes(searchLower);
       const matchesStatus =
-        statusFilter === "Todos" || order.status.toLowerCase() === statusFilter.toLowerCase()
-      return matchesSearch && matchesStatus
+        statusFilter === "Todos" || order.status.toLowerCase() === statusFilter.toLowerCase();
+      return (matchesName || matchesId) && matchesStatus;
     })
     .sort((a, b) => {
       // Ordena por fecha descendente (más recientes primero)
@@ -170,6 +172,7 @@ export default function DeliveriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Telefono</TableHead>
                 {/* <TableHead>Dirección</TableHead> */}
@@ -211,6 +214,9 @@ export default function DeliveriesPage() {
 
                 return (
                   <TableRow key={delivery._id}>
+                    <TableCell>
+                      <span className="text-md text-gray-500">{delivery._id}</span>
+                    </TableCell>
                     <TableCell>
                       <div className="font-medium">{delivery.name}</div>
                     </TableCell>
