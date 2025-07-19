@@ -34,7 +34,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
     }
     const { neighborhood } = shippingData;
     //console.log("Vecindario:", neighborhood);
-    setAddress(neighborhood);
+    setAddress(neighborhood+" Cancún");
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,6 +62,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
     try {
       const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${resultado}&key=${process.env.NEXT_PUBLIC_GOOGLE_CLOUD_API_KEY}`);
       const data = await res.json();
+      console.log("Datos de la dirección:", data);
       const city = data.results[0]?.address_components[1]?.long_name;
       const city2= data.results[0]?.address_components[2]?.long_name;
 
