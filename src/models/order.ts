@@ -4,7 +4,7 @@ import { required } from "zod/mini";
 const schema = new mongoose.Schema({
     id: String,
     name: String,
-    address: {nombre: String, telefono: String, calle: String, numero: String, colonia: String, codigoPostal: Number},
+    address: {nombre: String, telefono: String, region: String, manzana: String, lote: String, calle: String, numero: String, colonia: String, codigoPostal: Number},
     products: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         type: { type: String, enum: ["D", "I"], required: true }, // se guarda como 'type'

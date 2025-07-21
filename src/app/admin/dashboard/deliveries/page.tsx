@@ -188,6 +188,9 @@ export default function DeliveriesPage() {
                 const numero = delivery.address.numero
                 const colonia = delivery.address.colonia
                 const codigoPostal = delivery.address.codigoPostal
+                const region = delivery.address.region
+                const manzana = delivery.address.manzana
+                const lote = delivery.address.lote
 
                 const fecha = new Date(delivery.createdAt)
                 const fechaFormateada = fecha.toLocaleDateString("es-MX", {
@@ -268,6 +271,9 @@ export default function DeliveriesPage() {
                             <p><strong>Teléfono:</strong> {delivery.address.telefono}</p>
                             <p><strong>Dirección:</strong></p>
                             <ul className="ml-4 list-disc text-sm">
+                              <li>{`Región: ${region}`}</li>
+                              <li>{`Manzana: ${manzana}`}</li>
+                              <li>{`Lote: ${lote}`}</li>
                               <li>{`Calle: ${calle}`}</li>
                               <li>{`Número: ${numero}`}</li>
                               <li>{`Colonia: ${colonia}`}</li>

@@ -29,7 +29,11 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
   const handleShippingForm = (shippingData: any, errors: any) => {
     //console.log("Datos de envío recibidos desde el componente hijo:", shippingData);
     //Actualizamos el estado shippingData solo si todos los campos están completos
-    if(shippingData.fullName && shippingData.phone && shippingData.street && shippingData.number && shippingData.neighborhood && shippingData.postalCode) {
+    if(shippingData.fullName && shippingData.phone 
+      && shippingData.street && shippingData.number 
+      && shippingData.neighborhood && shippingData.postalCode
+      && shippingData.region && shippingData.manzana && shippingData.lote
+    ) {
     setShippingData(shippingData);
       
     }

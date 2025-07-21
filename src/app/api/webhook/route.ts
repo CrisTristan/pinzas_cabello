@@ -75,6 +75,9 @@ export async function POST(request: Request) {
         address: {
           nombre: shippingData.fullName,
           telefono: shippingData.phone,
+          region: shippingData.region,
+          manzana: shippingData.manzana,
+          lote: shippingData.lote,
           calle: shippingData.street,
           numero: shippingData.number,
           colonia: shippingData.neighborhood,
