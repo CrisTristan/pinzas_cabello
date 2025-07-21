@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongoDB";
 import Order from "@/models/order";
+import Product from "@/models/product";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -54,21 +55,47 @@ export async function POST(request: Request) {
       console.log("Productos comprados:", products);
       // Actualizar el stock de los productos
       for (const product of products) {
-        const { productId, type, quantity } = product;
+        const { _id, type, quantity } = product;
         // Restar la cantidad comprada al stock correspondiente
         if (type === 'D') {
-          await mongoose.model('Product').findByIdAndUpdate(
-            productId,
-            { $inc: { stockDocena: -Math.abs(quantity) } }
-          );
+          try {
+            // El _id en tu base es un ObjectId, pero lo guardas como String en el modelo.
+            // Asegúrate de que el _id recibido es string y coincide exactamente.
+            const update = await Product.findByIdAndUpdate(
+              _id,
+              { $inc: { stockDocena: -Math.abs(quantity) } },
+              { new: true } // opcional: devuelve el documento actualizado
+            );
+
+            if (!update) {
+              console.error(`No se encontró el producto con _id: ${_id} (typeof: ${typeof _id}) para restar stockDocena`);
+            }
+
+            console.log(update);
+
+          } catch (error) {
+            console.error("Error al actualizar el stock de la docena:", error);
+          }
         } else if (type === 'I') {
-          await mongoose.model('Product').findByIdAndUpdate(
-            productId,
-            { $inc: { stockIndividual: -Math.abs(quantity) } }
-          );
+          try {
+            const update = await Product.findByIdAndUpdate(
+              _id,
+              { $inc: { stockDocena: -Math.abs(quantity) } },
+              { new: true } // opcional: devuelve el documento actualizado
+            );
+
+            if (!update) {
+              console.error(`No se encontró el producto con _id: ${_id} (typeof: ${typeof _id}) para restar stockDocena`);
+            }
+
+            console.log(update);
+
+          } catch (error) {
+            console.error("Error al actualizar el stock individual:", error);
+          }
         }
       }
-      
+
       const order = {
         id: paymentIntentSucceeded.id,
         name: shippingData.fullName,
