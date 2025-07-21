@@ -109,7 +109,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
     console.log("Stock actual", currentStock);
 
     if(currentStock === 0){
-      alert("No hay stock disponible para este producto");
+      alert("No hay más unidades disponibles para este producto");
       return;
     }
 
