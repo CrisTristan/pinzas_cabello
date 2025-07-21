@@ -4,7 +4,16 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { Product } from '@/types/product'
 
-export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image, stockDocena, stockIndividual }: Product): React.JSX.Element => {
+export const ProductCard = ({
+  _id,
+  name,
+  individualPrice,
+  docenaPrice,
+  image,
+  stockDocena,
+  stockIndividual,
+  onAddToCart,
+}: Product & { onAddToCart?: (product: Product, selectedOption: string) => void }): React.JSX.Element => {
 
   const [selectedOption, setSelectedOption] = useState('D');
 
@@ -47,9 +56,7 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image, st
   };
 
   return (
-    <div
-      className="bg-peach text-center p-4 rounded-md flex flex-col items-center gap-2"
-    >
+    <div className="bg-peach text-center p-4 rounded-md flex flex-col items-center gap-2">
       <h2 className="font-bold text-lg text-pink-500">{name}</h2>
       {/* <p>{_id}</p> */}
       <div>
@@ -110,7 +117,9 @@ export const ProductCard = ({ _id, name, individualPrice, docenaPrice, image, st
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}
-          onClick={() => handleAddToCart({ productId: _id, _id, name, individualPrice, docenaPrice, image, type: selectedOption })}
+          onClick={() => {
+            if (onAddToCart) onAddToCart({ _id, name, individualPrice, docenaPrice, image, stockDocena, stockIndividual }, selectedOption);
+          }}
           disabled={
             (selectedOption === 'D' && (stockDocena ?? 0) === 0) ||
             (selectedOption === 'I' && (stockIndividual ?? 0) === 0)

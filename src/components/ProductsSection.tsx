@@ -11,20 +11,71 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
   const [showCart, setShowCart] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(()=>{//TODO
-    fetch("/api/products")
-    .then(res => res.json())
-    .then(data => {
-      console.log("Productos cargados:", data);
-      setProducts(data);
-    })
+  // Guardar el stock inicial para no exceder el máximo
+  const [initialStocks, setInitialStocks] = useState<Record<string, { stockDocena: number, stockIndividual: number }>>({});
 
+  useEffect(() => {
+    fetch("/api/products")
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        // Guardar el stock inicial de cada producto
+        const stocks: Record<string, { stockDocena: number, stockIndividual: number }> = {};
+        data.forEach((p: Product) => {
+          stocks[p._id] = {
+            stockDocena: p.stockDocena ?? 0,
+            stockIndividual: p.stockIndividual ?? 0,
+          };
+        });
+        setInitialStocks(stocks);
+
+        // Ajustar el stock según el carrito después de cargar productos y stocks
+        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (storedCart.length > 0) {
+          setProducts(prev =>
+            data.map((p: Product) => {
+              const cartItem = storedCart.find((item: any) => item._id === p._id);
+              if (cartItem) {
+                if (cartItem.type === 'D') {
+                  return { ...p, stockDocena: (p.stockDocena ?? 0) - (cartItem.quantity || 1) };
+                } else {
+                  return { ...p, stockIndividual: (p.stockIndividual ?? 0) - (cartItem.quantity || 1) };
+                }
+              }
+              return p;
+            })
+          );
+        }
+      });
   }, []);
 
   useEffect(() => {
     // Leer el carrito del localStorage al cargar la página
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(storedCart);
+    //console.log(storedCart)
+    //Actualizar el estado de los productos con el stock inicial
+    // muy importante tener en cuenta el quantity del producto en el carrito
+    // Restarle el quantity del producto en el carrito al stock inicial
+    //console.log(products);
+    
+    // setProducts(prev =>
+    //   prev.map(p => {
+    //     const cartItem = storedCart.find((item: Product) => item._id === p._id);
+    //     if (cartItem) {
+    //       // console.log("Actualizando stock de producto", p._id);
+    //       if( cartItem.type === 'D') {
+    //         // console.log("Actualizando stock de docena");
+    //         return { ...p, stockDocena: (p.stockDocena ?? 0) - (cartItem.quantity || 1) };
+    //       }else {
+    //         console.log("Actualizando stock de individual");
+    //         return { ...p, stockIndividual: (p.stockIndividual ?? 0) - (cartItem.quantity || 1) };
+    //       }
+    //     }
+    //     return p;
+    //   })
+    // );
+
     // Escuchar cambios en el localStorage (por si se añade desde otro tab)
     const handleStorage = () => {
       setCart(JSON.parse(localStorage.getItem('cart') || '[]'));
@@ -47,12 +98,50 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
   };
 
   const handleIncrease = (id: string, type: string) => {
+
+    const initialStock = initialStocks[id];
+    //obtener el stock actual del producto
+    const currentStock = type === 'D' 
+      ? products.find(p => String(p._id) === String(id))?.stockDocena 
+      : products.find(p => String(p._id) === String(id))?.stockIndividual;
+
+    console.log("stock Inicial", initialStock);
+    console.log("Stock actual", currentStock);
+
+    if(currentStock === 0){
+      alert("No hay stock disponible para este producto");
+      return;
+    }
+
     const newCart = cart.map(item =>
       item._id === id && item.type === type
         ? { ...item, quantity: (item.quantity || 1) + 1 }
         : item
     );
     updateCart(newCart);
+
+    
+    // Sumar 1 al stock correspondiente, sin exceder el stock inicial
+    setProducts(prev =>
+      prev.map(p => {
+        if (String(p._id) === String(id)) {
+          if (type === 'D') {
+            // const maxStock = initialStocks[id]?.stockDocena ?? 0;
+            // const newStock = Math.min((p.stockDocena ?? 0) + 1, maxStock);
+            return { ...p, stockDocena: (p.stockDocena ?? 0) - 1 };
+          } else {
+            //const maxStock = initialStocks[id]?.stockIndividual ?? 0;
+            //const newStock = Math.min((p.stockIndividual ?? 0) + 1, maxStock);
+            return { ...p, stockIndividual: (p.stockIndividual ?? 0) - 1 };
+          }
+        }
+        return p;
+      })
+    );
+
+    console.log("Productos", products);
+
+
   };
 
   const handleDecrease = (id: string, type: string) => {
@@ -64,6 +153,61 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
       )
       .filter(item => (item.quantity && item.quantity > 0)); // Solo deja productos con cantidad > 0
     updateCart(newCart);
+
+    // Restar 1 al stock correspondiente, sin bajar de 0
+    setProducts(prev =>
+      prev.map(p => {
+        if (String(p._id) === String(id)) {
+          if (type === 'D') {
+            //const newStock = Math.max((p.stockDocena ?? 0) - 1, 0);
+            return { ...p, stockDocena: (p.stockDocena ?? 0) + 1 };
+          } else {
+            //const newStock = Math.max((p.stockIndividual ?? 0) + 1, 0);
+            return { ...p, stockIndividual: (p.stockIndividual ?? 0) + 1 };
+          }
+        }
+        return p;
+      })
+    );
+  };
+
+  // Añadir al carrito y actualizar el stock localmente
+  const handleAddToCartAndUpdateStock = (product: Product, selectedOption: string) => {
+    console.log(product);
+    console.log(selectedOption);
+
+    //console.log("stock Inicial", initialStocks[product._id]);
+    // Añadir al carrito
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingIndex = cart.findIndex((item: Product) => item._id === product._id && item.type === selectedOption);
+    if (existingIndex !== -1) {
+      cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
+    } else {
+      cart.push({ ...product, quantity: 1, price: selectedOption === 'D' ? product.docenaPrice : product.individualPrice, type: selectedOption });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    setCart(cart);
+
+    // Actualizar el stock en el estado products
+    setProducts(prevProducts =>
+      prevProducts.map(p => {
+        if (p._id === product._id) {
+          if (selectedOption === 'D') {
+            console.log("Restando 1 al stock de docena");
+            //const newStockDocena = Math.max((p.stockDocena ?? 0) - 1, 0);
+            return { ...p, stockDocena: (p.stockDocena ?? 0) -1 };
+          } else {
+            const newStockIndividual = Math.max((p.stockIndividual ?? 0) - 1, 0);
+            return { ...p, stockIndividual: newStockIndividual };
+          }
+        }
+        return p;
+      })
+    );
+
+    //Mostrar el stock actual del producto
+    console.log("Stock actualizado:", products.find(p => p._id === product._id)?.stockDocena, products.find(p => p._id === product._id)?.stockIndividual);
+    
   };
 
   return (
@@ -104,6 +248,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
                   <button
                     className="bg-gray-200 text-green-500 font-bold p-2 text-xl"
                     onClick={() => handleIncrease(item._id, item.type)}
+                    // disabled={}
                   >+</button>
                   <button
                     className="bg-gray-200 text-red-500 font-bold p-2 px-3 text-xl"
@@ -139,18 +284,20 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
       )}
       <div className="grid grid-cols-1 gap-10 m-5">
         {products.map((product, i) => (
-        <ProductCard
-          key={product._id}
-          _id={product._id}
-          productId={product.productId}
-          name={product.name}
-          individualPrice={product.individualPrice}
-          docenaPrice={product.docenaPrice}
-          image={product.image}
-          stockDocena={product.stockDocena}
-          stockIndividual={product.stockIndividual}
-        />
-      ))}
+          <ProductCard
+            key={product._id}
+            _id={product._id}
+            productId={product.productId}
+            name={product.name}
+            individualPrice={product.individualPrice}
+            docenaPrice={product.docenaPrice}
+            image={product.image}
+            stockDocena={product.stockDocena}
+            stockIndividual={product.stockIndividual}
+            // Nuevo prop para manejar el stock local
+            onAddToCart={handleAddToCartAndUpdateStock}
+          />
+        ))}
       </div>
     </div>
   )
