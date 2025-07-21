@@ -7,6 +7,17 @@ import { z } from 'zod';
 // Definir el esquema de validación con zod
 const shippingSchema = z.object({
   fullName: z.string().min(3, 'El nombre completo es obligatorio'),
+  region: z
+    .string()
+    .min(3, 'La región es obligatoria')
+    .regex(/^\d+$/, 'La region debe contener solo números'),
+  manzana: z
+    .string()
+    .min(2, 'La manzana es obligatoria')
+    .regex(/^\d+$/, 'La manzana debe contener solo números'),
+  lote: z
+    .string()
+    .min(1, 'El lote es obligatorio'),
   phone: z
     .string()
     .min(10, 'El teléfono debe tener al menos 10 dígitos')
@@ -29,6 +40,9 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
+    region: '',
+    manzana: '',
+    lote: '',
     street: '',
     number: '',
     neighborhood: '',
@@ -62,28 +76,28 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleShippingSubmit = () => {
-    //e.preventDefault();
+  // const handleShippingSubmit = () => {
+  //   //e.preventDefault();
 
-    const result = shippingSchema.safeParse(formData);
+  //   const result = shippingSchema.safeParse(formData);
 
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
+  //   if (!result.success) {
+  //     const fieldErrors: Record<string, string> = {};
 
-      result.error.issues.forEach(issue => {
-        const field = issue.path[0];
-        if (field) {
-          fieldErrors[field as string] = issue.message;
-        }
-      });
-      setErrors(fieldErrors);
-      return;
-    }
+  //     result.error.issues.forEach(issue => {
+  //       const field = issue.path[0];
+  //       if (field) {
+  //         fieldErrors[field as string] = issue.message;
+  //       }
+  //     });
+  //     setErrors(fieldErrors);
+  //     return;
+  //   }
 
-    setErrors({});
-    console.log('Formulario válido:', result.data);
-    // Aquí puedes enviar los datos a tu backend o integrarlos con Stripe
-  };
+  //   setErrors({});
+  //   console.log('Formulario válido:', result.data);
+  //   // Aquí puedes enviar los datos a tu backend o integrarlos con Stripe
+  // };
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-white shadow rounded">
@@ -114,6 +128,45 @@ export default function ShippingForm({onShippingData}: ShippingFormProps) {
           placeholder="Ej: 9981234567"
         />
         {errors.phone && <p className="text-red-500">{errors.phone}</p>}
+      </div>
+
+      {/* Región (Supermanzana) */}
+      <div className="mb-4">
+        <label className="block font-medium">Region</label>
+        <input
+          type="text"
+          name="region"
+          value={formData.region}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+        {errors.region && <p className="text-red-500">{errors.region}</p>}
+      </div>
+
+      {/* Manzana */}
+      <div className="mb-4">
+        <label className="block font-medium">Manzana</label>
+        <input
+          type="text"
+          name="manzana"
+          value={formData.manzana}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+        {errors.manzana && <p className="text-red-500">{errors.manzana}</p>}
+      </div>
+
+      {/* Lote */}
+      <div className="mb-4">
+        <label className="block font-medium">Lote</label>
+        <input
+          type="text"
+          name="lote"
+          value={formData.lote}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+        {errors.lote && <p className="text-red-500">{errors.lote}</p>}
       </div>
 
       {/* Calle */}
