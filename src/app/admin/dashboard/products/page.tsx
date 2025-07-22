@@ -1,5 +1,6 @@
 "use client"
 
+import ImageUploader from "@/components/ImageUploader"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,9 +23,9 @@ export default function ProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addName, setAddName] = useState("");
   const [addPrice, setAddPrice] = useState("");
-  const [addImage, setAddImage] = useState<File | null>(null);
+  const [addImage, setAddImage] = useState<string>("");
   const [addStock, setAddStock] = useState("");
-  const [addImagePreview, setAddImagePreview] = useState<string | null>(null);
+  //const [addImagePreview, setAddImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts()
@@ -105,19 +106,19 @@ export default function ProductsPage() {
     }
   }
 
+  const handleUploadImage = (imageUrl: string) => {
+      console.log(imageUrl)
+      setAddImage(imageUrl)
+  }
+
   const handleAddProduct = async () => {
     if (!addName || !addPrice || !addStock || !addImage) {
       alert("Todos los campos son obligatorios");
       return;
     }
-
     // Subir la imagen a un servidor o servicio (esto es un mock, deberías usar un endpoint real)
     // Aquí solo la convertimos a base64 para la demo
-    let imageUrl = "";
     if (addImage) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        imageUrl = reader.result as string;
         // Crear el producto
         const res = await fetch('/api/products', {
           method: "POST",
@@ -126,7 +127,7 @@ export default function ProductsPage() {
             name: addName,
             individualPrice: parseFloat(addPrice),
             docenaPrice: parseFloat(addPrice), // Puedes ajustar esto si tienes precios distintos
-            image: imageUrl,
+            image: addImage,
             stockIndividual: parseInt(addStock),
             stockDocena: parseInt(addStock),
           }),
@@ -136,16 +137,13 @@ export default function ProductsPage() {
           setShowAddModal(false);
           setAddName("");
           setAddPrice("");
-          setAddImage(null);
+          setAddImage("");
           setAddStock("");
-          setAddImagePreview(null);
         } else {
           alert("Error al agregar el producto");
         }
       };
-      reader.readAsDataURL(addImage);
-    }
-  };
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -284,7 +282,8 @@ export default function ProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Imagen del producto</label>
-                <Input
+                <ImageUploader onUploadImage={handleUploadImage}/>
+                {/* <Input
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
@@ -298,10 +297,10 @@ export default function ProductsPage() {
                       setAddImagePreview(null);
                     }
                   }}
-                />
-                {addImagePreview && (
+                /> */}
+                {/* {addImagePreview && (
                   <img src={addImagePreview} alt="Preview" className="mt-2 rounded w-32 h-32 object-cover" />
-                )}
+                )} */}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Stock</label>
