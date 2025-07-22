@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     // const {products} = await request.json();
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // $50.00 MXN
+      amount: amount,
       currency: 'mxn',
       automatic_payment_methods: { enabled: true },
       metadata: {

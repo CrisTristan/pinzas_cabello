@@ -19,6 +19,12 @@ export default function ProductsPage() {
   const [newIndividualPrice, setNewIndividualPrice] = useState("")
   const [newDocenaPrice, setNewDocenaPrice] = useState("")
   const [productToDelete, setProductToDelete] = useState<any | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addName, setAddName] = useState("");
+  const [addPrice, setAddPrice] = useState("");
+  const [addImage, setAddImage] = useState<File | null>(null);
+  const [addStock, setAddStock] = useState("");
+  const [addImagePreview, setAddImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts()
@@ -99,6 +105,48 @@ export default function ProductsPage() {
     }
   }
 
+  const handleAddProduct = async () => {
+    if (!addName || !addPrice || !addStock || !addImage) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
+
+    // Subir la imagen a un servidor o servicio (esto es un mock, deberías usar un endpoint real)
+    // Aquí solo la convertimos a base64 para la demo
+    let imageUrl = "";
+    if (addImage) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        imageUrl = reader.result as string;
+        // Crear el producto
+        const res = await fetch('/api/products', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: addName,
+            individualPrice: parseFloat(addPrice),
+            docenaPrice: parseFloat(addPrice), // Puedes ajustar esto si tienes precios distintos
+            image: imageUrl,
+            stockIndividual: parseInt(addStock),
+            stockDocena: parseInt(addStock),
+          }),
+        });
+        if (res.ok) {
+          await fetchProducts();
+          setShowAddModal(false);
+          setAddName("");
+          setAddPrice("");
+          setAddImage(null);
+          setAddStock("");
+          setAddImagePreview(null);
+        } else {
+          alert("Error al agregar el producto");
+        }
+      };
+      reader.readAsDataURL(addImage);
+    }
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       {/* ... encabezado omitido por brevedad ... */}
@@ -116,6 +164,24 @@ export default function ProductsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+            </div>
+            <div>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setShowAddModal(true);
+                  setSelectedProduct(null)
+                  setNewName("")
+                  setNewStockDocena("")
+                  setNewStockIndividual("")
+                  setNewIndividualPrice("")
+                  setNewDocenaPrice("")
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                Agregar Producto
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -186,6 +252,73 @@ export default function ProductsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Modal para agregar producto */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Agregar Producto</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowAddModal(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Nombre del producto</label>
+                <Input
+                  type="text"
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                  placeholder="Ej. Camiseta Azul"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Precio</label>
+                <Input
+                  type="number"
+                  value={addPrice}
+                  onChange={(e) => setAddPrice(e.target.value)}
+                  placeholder="Ej. 99.99"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Imagen del producto</label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setAddImage(file);
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setAddImagePreview(reader.result as string);
+                      reader.readAsDataURL(file);
+                    } else {
+                      setAddImagePreview(null);
+                    }
+                  }}
+                />
+                {addImagePreview && (
+                  <img src={addImagePreview} alt="Preview" className="mt-2 rounded w-32 h-32 object-cover" />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Stock</label>
+                <Input
+                  type="number"
+                  value={addStock}
+                  onChange={(e) => setAddStock(e.target.value)}
+                  placeholder="Ej. 20"
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={handleAddProduct}>Guardar</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de edición */}
   {selectedProduct && (
