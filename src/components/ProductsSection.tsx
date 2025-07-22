@@ -294,6 +294,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
             image={product.image}
             stockDocena={product.stockDocena}
             stockIndividual={product.stockIndividual}
+            category={product.category}
             // Nuevo prop para manejar el stock local
             onAddToCart={handleAddToCartAndUpdateStock}
           />

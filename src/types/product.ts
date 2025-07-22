@@ -6,6 +6,7 @@ export type Product = {
     docenaPrice: number;
     price?: number; // Precio total, puede ser individualPrice o docenaPric
     image: string;
+    category: string;
     stockDocena?: number; // Opcional para manejar el stock de docenas
     stockIndividual?: number; // Opcional para manejar el stock individual
     type?: string; // Opcional para manejar opciones como "Docena" o "Individual"

@@ -8,6 +8,7 @@ const schema = new mongoose.Schema({
     description: String,
     stockDocena: Number,
     stockIndividual: Number,
+    category: { type: String, enum: ["pinzas", "ropa", "calzado"], default: "pinzas" },
 })
 
 export default mongoose.models.Product || mongoose.model("Product", schema);

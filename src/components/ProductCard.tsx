@@ -12,23 +12,11 @@ export const ProductCard = ({
   image,
   stockDocena,
   stockIndividual,
+  category,
   onAddToCart,
 }: Product & { onAddToCart?: (product: Product, selectedOption: string) => void }): React.JSX.Element => {
 
   const [selectedOption, setSelectedOption] = useState('D');
-
-  const handlePay = async (product: Product) => {
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(product),
-    })
-    const session = await res.json();
-    console.log(session);
-    window.location = session.url; //redireccion a la url de pago
-  }
 
   const handleAddToCart = (product: Product) => {
     // Obtener el carrito actual o inicializarlo
@@ -59,7 +47,7 @@ export const ProductCard = ({
     <div className="bg-peach text-center p-4 rounded-md flex flex-col items-center gap-2">
       <h2 className="font-bold text-lg text-pink-500">{name}</h2>
       {/* <p>{_id}</p> */}
-      <div>
+      {category === 'pinzas' && <div>
         <label className="mr-4">
           <input
             type="radio"
@@ -82,6 +70,8 @@ export const ProductCard = ({
           <span className="ml-2 text-orange-500 font-bold">Individual</span>
         </label>
       </div>
+      }
+      
       <Image
         src={image}
         width={400}

@@ -23,6 +23,7 @@ export default function ProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addName, setAddName] = useState("");
   const [addPrice, setAddPrice] = useState("");
+  const [addCategory, setAddCategory] = useState("");
   const [addImage, setAddImage] = useState<string>("");
   const [addStock, setAddStock] = useState("");
   //const [addImagePreview, setAddImagePreview] = useState<string | null>(null);
@@ -130,6 +131,7 @@ export default function ProductsPage() {
             image: addImage,
             stockIndividual: parseInt(addStock),
             stockDocena: parseInt(addStock),
+            category: addCategory
           }),
         });
         if (res.ok) {
@@ -238,9 +240,9 @@ export default function ProductsPage() {
                         }}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        {/* <Button variant="ghost" size="sm" onClick={() => setProductToDelete(product)}>
+                        <Button variant="ghost" size="sm" onClick={() => setProductToDelete(product)}>
                           <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button> */}
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -283,24 +285,44 @@ export default function ProductsPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Imagen del producto</label>
                 <ImageUploader onUploadImage={handleUploadImage}/>
-                {/* <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setAddImage(file);
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => setAddImagePreview(reader.result as string);
-                      reader.readAsDataURL(file);
-                    } else {
-                      setAddImagePreview(null);
-                    }
-                  }}
-                /> */}
-                {/* {addImagePreview && (
-                  <img src={addImagePreview} alt="Preview" className="mt-2 rounded w-32 h-32 object-cover" />
-                )} */}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Categoría</label>
+                <div className="flex gap-4 mt-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="category"
+                      value="pinzas"
+                      checked={addCategory === "pinzas"}
+                      onChange={() => setAddCategory("pinzas")}
+                      className="mr-2"
+                    />
+                    Pinzas
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="category"
+                      value="ropa"
+                      checked={addCategory === "ropa"}
+                      onChange={() => setAddCategory("ropa")}
+                      className="mr-2"
+                    />
+                    Ropa
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="category"
+                      value="calzado"
+                      checked={addCategory === "calzado"}
+                      onChange={() => setAddCategory("calzado")}
+                      className="mr-2"
+                    />
+                    Calzado
+                  </label>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Stock</label>
