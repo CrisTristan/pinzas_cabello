@@ -274,7 +274,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
                 const params = new URLSearchParams({
                   cart: JSON.stringify(cart)
                 });
-                window.location.href = `http://localhost:3000/checkout?${params.toString()}`;
+                window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/checkout?${params.toString()}` || `http://localhost:3000/checkout?${params.toString()}`;
               }}
             >
               Ir a Pagar
