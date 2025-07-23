@@ -37,8 +37,8 @@ export async function POST(req: Request) {
       })
 
     const uploaded = await streamUpload()
-
-    return NextResponse.json({ url: uploaded.secure_url }, { status: 200 })
+    console.log("Uploaded", uploaded);
+    return NextResponse.json({ url: uploaded.secure_url, publicId: uploaded.public_id }, { status: 200 })
   } catch (err) {
     return NextResponse.json({ error: err }, { status: 500 })
   }

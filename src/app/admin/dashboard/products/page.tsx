@@ -26,7 +26,7 @@ export default function ProductsPage() {
   const [addCategory, setAddCategory] = useState("");
   const [addImage, setAddImage] = useState<string>("");
   const [addStock, setAddStock] = useState("");
-  //const [addImagePreview, setAddImagePreview] = useState<string | null>(null);
+  const [publicId, setPublicId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts()
@@ -95,6 +95,22 @@ export default function ProductsPage() {
   const handleDeleteProduct = async () => {
     if (!productToDelete) return
 
+    const product = await fetch(`/api/products?id=${productToDelete._id}`)
+    const data = await product.json();
+    //console.log(data);
+    const publicId = data.publicId;
+    if(publicId){
+      const res = await fetch("/api/delete", {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ publicId })
+      })
+      if(!res.ok){
+        console.error("Error al eliminar la imagen de Cloudinary")
+      }
+    }
     const res = await fetch(`/api/products?id=${productToDelete._id}`, {
       method: "DELETE"
     })
@@ -107,9 +123,10 @@ export default function ProductsPage() {
     }
   }
 
-  const handleUploadImage = (imageUrl: string) => {
-      console.log(imageUrl)
+  const handleUploadImage = (imageUrl: string, publicId: string) => {
+      //console.log(imageUrl)
       setAddImage(imageUrl)
+      setPublicId(publicId)
   }
 
   const handleAddProduct = async () => {
@@ -119,7 +136,7 @@ export default function ProductsPage() {
     }
     // Subir la imagen a un servidor o servicio (esto es un mock, deberías usar un endpoint real)
     // Aquí solo la convertimos a base64 para la demo
-    if (addImage) {
+    if (addImage && publicId) {
         // Crear el producto
         const res = await fetch('/api/products', {
           method: "POST",
@@ -131,7 +148,8 @@ export default function ProductsPage() {
             image: addImage,
             stockIndividual: parseInt(addStock),
             stockDocena: parseInt(addStock),
-            category: addCategory
+            category: addCategory,
+            publicId: publicId
           }),
         });
         if (res.ok) {

@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from 'react'
 
-export default function ImageUploader({onUploadImage}: {onUploadImage?: (url: string) => void}) {
+export default function ImageUploader({onUploadImage}: {onUploadImage?: (url: string, publicId: string) => void}) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [publicId, setPublicId] = useState<string | null>(null)
 
   useEffect(() => {
     // Avizar al componente padre cuando la imagen se haya subido
-    if (imageUrl && onUploadImage) {
-        onUploadImage(imageUrl);
+    if (imageUrl && publicId && onUploadImage) {
+        onUploadImage(imageUrl, publicId);
     }
     
-  }, [imageUrl]);
+  }, [imageUrl, publicId]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -35,6 +36,7 @@ export default function ImageUploader({onUploadImage}: {onUploadImage?: (url: st
     const data = await res.json()
     setUploading(false)
     setImageUrl(data.url)
+    setPublicId(data.publicId)
   }
 
   return (
