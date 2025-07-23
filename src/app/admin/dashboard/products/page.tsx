@@ -22,10 +22,12 @@ export default function ProductsPage() {
   const [productToDelete, setProductToDelete] = useState<any | null>(null)
   const [showAddModal, setShowAddModal] = useState(false);
   const [addName, setAddName] = useState("");
-  const [addPrice, setAddPrice] = useState("");
+  const [addPriceIndividual, setAddPriceIndividual] = useState("");
+  const [addPriceDocena, setAddPriceDocena] = useState("");
   const [addCategory, setAddCategory] = useState("");
   const [addImage, setAddImage] = useState<string>("");
-  const [addStock, setAddStock] = useState("");
+  const [addStockIndividual, setAddStockIndividual] = useState("");
+  const [addStockDocena, setAddStockDocena] = useState("");
   const [publicId, setPublicId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,39 +132,45 @@ export default function ProductsPage() {
   }
 
   const handleAddProduct = async () => {
-    if (!addName || !addPrice || !addStock || !addImage) {
+    if (
+      !addName ||
+      !addPriceIndividual ||
+      !addPriceDocena ||
+      !addStockIndividual ||
+      !addStockDocena ||
+      !addImage
+    ) {
       alert("Todos los campos son obligatorios");
       return;
     }
-    // Subir la imagen a un servidor o servicio (esto es un mock, deberías usar un endpoint real)
-    // Aquí solo la convertimos a base64 para la demo
     if (addImage && publicId) {
-        // Crear el producto
-        const res = await fetch('/api/products', {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: addName,
-            individualPrice: parseFloat(addPrice),
-            docenaPrice: parseFloat(addPrice), // Puedes ajustar esto si tienes precios distintos
-            image: addImage,
-            stockIndividual: parseInt(addStock),
-            stockDocena: parseInt(addStock),
-            category: addCategory,
-            publicId: publicId
-          }),
-        });
-        if (res.ok) {
-          await fetchProducts();
-          setShowAddModal(false);
-          setAddName("");
-          setAddPrice("");
-          setAddImage("");
-          setAddStock("");
-        } else {
-          alert("Error al agregar el producto");
-        }
-      };
+      const res = await fetch('/api/products', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: addName,
+          individualPrice: parseFloat(addPriceIndividual),
+          docenaPrice: parseFloat(addPriceDocena),
+          image: addImage,
+          stockIndividual: parseInt(addStockIndividual),
+          stockDocena: parseInt(addStockDocena),
+          category: addCategory,
+          publicId: publicId
+        }),
+      });
+      if (res.ok) {
+        await fetchProducts();
+        setShowAddModal(false);
+        setAddName("");
+        setAddPriceIndividual("");
+        setAddPriceDocena("");
+        setAddImage("");
+        setAddStockIndividual("");
+        setAddStockDocena("");
+      } else {
+        alert("Error al agregar el producto");
+      }
+    }
   }
 
   return (
@@ -292,12 +300,21 @@ export default function ProductsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Precio</label>
+                <label className="block text-sm font-medium mb-1">Precio Individual</label>
                 <Input
                   type="number"
-                  value={addPrice}
-                  onChange={(e) => setAddPrice(e.target.value)}
+                  value={addPriceIndividual}
+                  onChange={(e) => setAddPriceIndividual(e.target.value)}
                   placeholder="Ej. 99.99"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Precio Docena</label>
+                <Input
+                  type="number"
+                  value={addPriceDocena}
+                  onChange={(e) => setAddPriceDocena(e.target.value)}
+                  placeholder="Ej. 999.99"
                 />
               </div>
               <div>
@@ -343,12 +360,21 @@ export default function ProductsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Stock</label>
+                <label className="block text-sm font-medium mb-1">Stock Individual</label>
                 <Input
                   type="number"
-                  value={addStock}
-                  onChange={(e) => setAddStock(e.target.value)}
+                  value={addStockIndividual}
+                  onChange={(e) => setAddStockIndividual(e.target.value)}
                   placeholder="Ej. 20"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Stock Docena</label>
+                <Input
+                  type="number"
+                  value={addStockDocena}
+                  onChange={(e) => setAddStockDocena(e.target.value)}
+                  placeholder="Ej. 10"
                 />
               </div>
               <div className="flex justify-end">

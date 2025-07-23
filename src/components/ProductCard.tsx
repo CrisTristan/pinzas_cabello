@@ -47,7 +47,7 @@ export const ProductCard = ({
     <div className="bg-peach text-center p-4 rounded-md flex flex-col items-center gap-2">
       <h2 className="font-bold text-lg text-pink-500">{name}</h2>
       {/* <p>{_id}</p> */}
-      {category === 'pinzas' && <div>
+      {true && <div>
         <label className="mr-4">
           <input
             type="radio"
