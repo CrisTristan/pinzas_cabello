@@ -1,10 +1,13 @@
+"use client"
+
 import Link from "next/link"
 import React, { useState } from 'react'
 import Image from "next/image"
 import { Menu, X } from "lucide-react"
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/server"
+import { LoginLink, useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 
 export const NavBar = () => {
+    const {isAuthenticated} = useKindeBrowserClient();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     
@@ -60,9 +63,15 @@ export const NavBar = () => {
                             >
                                 Contacto
                             </Link>
-                            <LoginLink className="w-auto self-start px-3 py-2 bg-blue-500 rounded-md text-white font-medium">
-                                Iniciar sesión
-                            </LoginLink>
+                            {
+                                isAuthenticated ? 
+                                    <Link href="/admin/dashboard" className="w-auto self-start px-3 py-2 bg-blue-500 rounded-md text-white font-medium">
+                                        Ir al Panel
+                                    </Link>
+                                :<LoginLink className="w-auto self-start px-3 py-2 bg-blue-500 rounded-md text-white font-medium">
+                                    Iniciar sesión
+                                </LoginLink>
+                            }
                         </nav>
                     </div>
                 )}

@@ -82,10 +82,15 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
+      // NEW: Cierra el Sheet móvil si estamos en móvil y se pide cerrar
+    if (isMobile && openState === false) {
+      setOpenMobile(false)
+    }
+
       // This sets the cookie to keep the sidebar state.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
     },
-    [setOpenProp, open]
+    [setOpenProp, open, isMobile, setOpenMobile]
   )
 
   // Helper to toggle the sidebar.

@@ -67,7 +67,12 @@ const settingsItems = [
 
 
 export function AppSidebar({isLoggedIn}: { isLoggedIn?: boolean}) {
-  
+  const {setOpen} = useSidebar();
+
+  const handleLinkClick = () => {
+    setOpen(false);
+  };
+
   return (
     <Sidebar className="w-64">
       <SidebarHeader className="border-b border-sidebar-border">
@@ -84,15 +89,23 @@ export function AppSidebar({isLoggedIn}: { isLoggedIn?: boolean}) {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleLinkClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem >
+                <SidebarMenuButton asChild>
+                  <Link className="" href="/">
+                    <Home className="h-4 w-4" />
+                    <span>Pagina Principal</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem className="mt-5 flex justify-center items-center">
-                {isLoggedIn && <LogoutLink className="bg-blue-500 p-3 rounded-md mt-4">Salir</LogoutLink>}
+                {isLoggedIn && <LogoutLink className="bg-blue-500 p-3 rounded-md mt-4">Cerrar Sesión</LogoutLink>}
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

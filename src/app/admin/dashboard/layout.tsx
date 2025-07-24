@@ -19,10 +19,22 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   
-  const {isAuthenticated, getUser} = getKindeServerSession();
+  const {isAuthenticated, getUser, getRoles} = getKindeServerSession();
   const isLoggedIn = await isAuthenticated();
   const user = isLoggedIn ? await getUser() : null;
 
+  const roles = isLoggedIn ? await getRoles() : [];
+  console.log("User roles:", roles);
+  if (
+    !(roles?.[0]?.key === ("admin_user"))
+  ) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <h1 className="text-2xl font-bold">Acceso Denegado</h1>
+      </div>
+    )
+  }
+  
   return (
     <SidebarProvider>
       <AppSidebar
