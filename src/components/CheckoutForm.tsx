@@ -42,7 +42,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
     setAddress(neighborhood);
     if(errors && Object.keys(errors).length > 0) {
       // toast.error(errors);
-      console.log("Errores en el formulario de envío:", errors);
+      //console.log("Errores en el formulario de envío:", errors);
       setErrorsOnShippingForm(errors);
       return;
     }
@@ -118,7 +118,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
         elements,
         clientSecret: paymentIntentData.clientSecret,
         confirmParams: {
-          return_url: "http://localhost:3000/success",
+          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`, // Asegúrate de que esta URL sea correcta
         },
         redirect: "if_required", // Importante: solo redirige si es necesario
       });
@@ -127,7 +127,7 @@ export const CheckoutForm = ({amount, products}: {amount: number, products: Prod
         setErrorMessage(error.message);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         toast.success("Pago realizado con éxito");
-        window.location.href = "http://localhost:3000/success";
+        window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/success`; // Redirige al usuario a la página de éxito
       }
       // Si el pago requiere redirección, Stripe lo hará automáticamente y este código no se ejecutará
     } catch (error) {
