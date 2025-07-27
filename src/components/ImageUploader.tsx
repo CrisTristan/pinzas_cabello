@@ -45,7 +45,8 @@ export default function ImageUploader({onUploadImage}: {onUploadImage?: (url: st
         type="file"
         accept="image/*"
         onChange={handleUpload}
-        className="file-input file-input-bordered w-full max-w-xs"
+        className="file-input file-input-bordered w-full max-w-xs bg-blue-200"
+        disabled={uploading}
       />
 
       {/* Preview antes de subir */}
