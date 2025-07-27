@@ -56,35 +56,9 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
   }, []);
 
   useEffect(() => {
-        console.log("Productos cargados despues de ajustar stock:", products);
-  }, [products]);
-
-  useEffect(() => {
     // Leer el carrito del localStorage al cargar la página
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(storedCart);
-    //console.log(storedCart)
-    //Actualizar el estado de los productos con el stock inicial
-    // muy importante tener en cuenta el quantity del producto en el carrito
-    // Restarle el quantity del producto en el carrito al stock inicial
-    //console.log(products);
-    
-    // setProducts(prev =>
-    //   prev.map(p => {
-    //     const cartItem = storedCart.find((item: Product) => item._id === p._id);
-    //     if (cartItem) {
-    //       // console.log("Actualizando stock de producto", p._id);
-    //       if( cartItem.type === 'D') {
-    //         // console.log("Actualizando stock de docena");
-    //         return { ...p, stockDocena: (p.stockDocena ?? 0) - (cartItem.quantity || 1) };
-    //       }else {
-    //         console.log("Actualizando stock de individual");
-    //         return { ...p, stockIndividual: (p.stockIndividual ?? 0) - (cartItem.quantity || 1) };
-    //       }
-    //     }
-    //     return p;
-    //   })
-    // );
 
     // Escuchar cambios en el localStorage (por si se añade desde otro tab)
     const handleStorage = () => {
