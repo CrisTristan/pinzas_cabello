@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Panel de administración para gestionar tu tienda en línea",
   icons: {
     icon: [
-      { url: '/favicon.ico', href: '/favicon.ico' },
+      { url: '/icon.ico', href: '/icon.ico' },
     ],
   },
 }
