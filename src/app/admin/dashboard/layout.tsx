@@ -11,6 +11,11 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Dashboard - Mi Tienda Online",
   description: "Panel de administración para gestionar tu tienda en línea",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', href: '/favicon.ico' },
+    ],
+  },
 }
 
 export default async function RootLayout({
