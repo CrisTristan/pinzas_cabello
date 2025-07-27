@@ -34,20 +34,30 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
         if (storedCart.length > 0) {
           setProducts(prev =>
             data.map((p: Product) => {
-              const cartItem = storedCart.find((item: any) => item._id === p._id);
-              if (cartItem) {
-                if (cartItem.type === 'D') {
-                  return { ...p, stockDocena: (p.stockDocena ?? 0) - (cartItem.quantity || 1) };
-                } else {
-                  return { ...p, stockIndividual: (p.stockIndividual ?? 0) - (cartItem.quantity || 1) };
-                }
-              }
-              return p;
+              // Filtrar todos los items del carrito con el mismo _id
+              const cartItems = storedCart.filter((item: any) => item._id === p._id);
+              // Sumar cantidades por tipo
+              const docenaQty = cartItems
+                .filter((item: any) => item.type === 'D')
+                .reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+              const individualQty = cartItems
+                .filter((item: any) => item.type === 'I')
+                .reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+
+              return {
+                ...p,
+                stockDocena: (p.stockDocena ?? 0) - docenaQty,
+                stockIndividual: (p.stockIndividual ?? 0) - individualQty,
+              };
             })
           );
         }
       });
   }, []);
+
+  useEffect(() => {
+        console.log("Productos cargados despues de ajustar stock:", products);
+  }, [products]);
 
   useEffect(() => {
     // Leer el carrito del localStorage al cargar la página
