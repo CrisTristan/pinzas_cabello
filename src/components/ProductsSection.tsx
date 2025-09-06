@@ -201,6 +201,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
           Catálogo de Productos
         </h1>
         <button
+          id='cart-button'
           className="relative bg-peach-primary rounded-full p-3"
           onClick={() => {
             setShowCart(!showCart);
@@ -218,7 +219,7 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
         </button>
       </div>
       {showCart && (
-        <div className="bg-white border rounded shadow p-4 m-5 max-w-md">
+        <div id="carrito" className="bg-white border rounded shadow p-4 m-5 max-w-md">
           <h2 className="font-bold mb-2">Carrito de compras</h2>
           {cart.length === 0 ? (
             <p>El carrito está vacío.</p>
