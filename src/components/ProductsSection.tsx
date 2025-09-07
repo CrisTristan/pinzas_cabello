@@ -236,6 +236,21 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
   socket.on("stockUpdate", (updatedProducts: Product[]) => {
     console.log("Actualización de stock recibida:", updatedProducts);
     setProducts(updatedProducts);
+    setCart([]);
+    localStorage.setItem('cart', JSON.stringify([]));
+    alert("El stock ha sido actualizado. Tu carrito ha sido limpiado. Por favor, revisa los productos disponibles.");
+    //limpiar el carrito si algún producto se queda sin stock
+    // const newCart = cart.filter(item => {
+    //   const product = updatedProducts.find(p => p._id === item._id);
+    //   if (!product) return false; // Producto eliminado
+    //   const availableStock = item.type === 'D' ? product.stockDocena ?? 0 : product.stockIndividual ?? 0;
+    //   return (item.quantity || 1) <= availableStock;
+    // });
+    // if (newCart.length !== cart.length) {
+    //   setCart(newCart);
+    //   localStorage.setItem('cart', JSON.stringify(newCart));
+    //   alert("Algunos productos han sido eliminados de tu carrito debido a falta de stock.");
+    // }
   });
 
   // Limpia la conexión al desmontar
