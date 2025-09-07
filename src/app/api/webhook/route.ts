@@ -5,12 +5,14 @@ import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongoDB";
 import Order from "@/models/order";
 import Product from "@/models/product";
+import { io } from "socket.io-client";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
+  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
 
   const body = await request.text(); //aqui se encuentra la direccion del cliente
   const headersList = await headers();
@@ -80,7 +82,7 @@ export async function POST(request: Request) {
           try {
             const update = await Product.findByIdAndUpdate(
               _id,
-              { $inc: { stockDocena: -Math.abs(quantity) } },
+              { $inc: { stockIndividual: -Math.abs(quantity) } },
               { new: true } // opcional: devuelve el documento actualizado
             );
 
@@ -124,16 +126,20 @@ export async function POST(request: Request) {
         await newOrder.save();
 
         //mandamos un correo electronico
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ clientName: shippingData.fullName }),
-        });
+        // const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send/`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({ clientName: shippingData.fullName }),
+        // });
 
-        const result = await res.json();
+        // const result = await res.json();
         // console.log(result);
+        //obtener todos los productos para enviarlos al administrador
+        const allProducts = await Product.find();
+
+        socket.emit("newOrder", allProducts); //notificar al servidor en tiempo real
 
         return NextResponse.json(newOrder, { status: 201 });
       } catch (error) {
