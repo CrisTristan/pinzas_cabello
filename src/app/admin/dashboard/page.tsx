@@ -4,17 +4,23 @@ import { DollarSign, Package, ShoppingCart, Users, Clock } from "lucide-react"
 import { getAllOrders } from "@/lib/getAllOrders"
 import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
+import ChartBarInteractive  from "@/components/chart"
 
 export default async function DashboardPage() {
   //auth check
 
   const orders = await getAllOrders();
+  const ordersSumary = orders.map(order =>({
+    date: new Date(order.createdAt).toISOString().split('T')[0],
+    total: order.total - 50, // Restar el costo de envío,
+    ventas: order.products.length,
+  }));
 
-  //console.log("Orders fetched:", orders);
+  console.log("Orders fetched:", orders);
   const totalSales = orders.reduce((sum, order) => (sum + order.total - 50), 0);
   
   const pendingDeliveries = orders.reduce((acc: number, order)=>{
-      if(order.status === "por entregar"){
+      if(order.status === "pendiente"){
         acc += 1;
       }
       return acc;
@@ -57,6 +63,9 @@ export default async function DashboardPage() {
             <div className="text-2xl font-bold">{pendingDeliveries}</div>
           </CardContent>
         </Card>
+      </div>
+      <div>
+        <ChartBarInteractive orders={ordersSumary}/>
       </div>
 
       {/* Resumen de actividad reciente */}

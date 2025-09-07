@@ -194,6 +194,39 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
     
   };
 
+  // Sincroniza el carrito con el stock actual cada vez que se muestra el carrito
+  useEffect(() => {
+    if (!showCart) return;
+
+    // Consulta el stock actual desde el backend
+    fetch("/api/products")
+      .then(res => res.json())
+      .then(latestProducts => {
+        let changed = false;
+        const updatedCart = cart.map(item => {
+          const product = latestProducts.find((p: Product) => p._id === item._id);
+          if (!product) return item; // Producto eliminado, lo dejamos igual
+
+          let maxStock = item.type === 'D'
+            ? product.stockDocena ?? 0
+            : product.stockIndividual ?? 0;
+
+          if ((item.quantity || 1) > maxStock) {
+            changed = true;
+            return { ...item, quantity: maxStock };
+          }
+          return item;
+        }).filter(item => item.quantity > 0);
+
+        if (changed) {
+          setCart(updatedCart);
+          localStorage.setItem('cart', JSON.stringify(updatedCart));
+          alert("Algunos de tus productos de tu carrito han sido cambiados debido a stock faltante");
+        }
+      });
+  // Solo cuando se muestra el carrito
+  }, [showCart]);
+
   return (
     <div>
       <div className="flex justify-between items-center m-5">

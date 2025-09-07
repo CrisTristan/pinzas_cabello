@@ -101,7 +101,7 @@ export default function OrdersPageClient() {
                 <TableHead>Orden</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Fecha</TableHead>
-                <TableHead>Items</TableHead>
+                <TableHead>Cantidad</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
@@ -130,7 +130,14 @@ export default function OrdersPageClient() {
                       </div>
                     </TableCell>
                     <TableCell>{fechaFormateada}</TableCell>
-                    <TableCell>{order.products.length}</TableCell>
+                    <TableCell>
+                      {
+                        // Suma las cantidades de todos los productos en el arreglo
+                        Array.isArray(order.products)
+                          ? order.products.reduce((acc, prod) => acc + (prod?.quantity || 0), 0)
+                          : 0
+                      }
+                    </TableCell>
                     <TableCell className="font-medium">
                       $ {order.total - 50}
                     </TableCell>

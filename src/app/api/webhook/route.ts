@@ -133,7 +133,7 @@ export async function POST(request: Request) {
         });
 
         const result = await res.json();
-        console.log(result);
+        // console.log(result);
 
         return NextResponse.json(newOrder, { status: 201 });
       } catch (error) {
