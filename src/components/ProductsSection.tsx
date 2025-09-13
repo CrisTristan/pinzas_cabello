@@ -195,39 +195,6 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
     
   };
 
-  // Sincroniza el carrito con el stock actual cada vez que se muestra el carrito
-  // useEffect(() => {
-  //   if (!showCart) return;
-
-  //   // Consulta el stock actual desde el backend
-  //   fetch("/api/products")
-  //     .then(res => res.json())
-  //     .then(latestProducts => {
-  //       let changed = false;
-  //       const updatedCart = cart.map(item => {
-  //         const product = latestProducts.find((p: Product) => p._id === item._id);
-  //         if (!product) return item; // Producto eliminado, lo dejamos igual
-
-  //         let maxStock = item.type === 'D'
-  //           ? product.stockDocena ?? 0
-  //           : product.stockIndividual ?? 0;
-
-  //         if ((item.quantity || 1) > maxStock) {
-  //           changed = true;
-  //           return { ...item, quantity: maxStock };
-  //         }
-  //         return item;
-  //       }).filter(item => item.quantity > 0);
-
-  //       if (changed) {
-  //         setCart(updatedCart);
-  //         localStorage.setItem('cart', JSON.stringify(updatedCart));
-  //         alert("Algunos de tus productos de tu carrito han sido cambiados debido a stock faltante");
-  //       }
-  //     });
-  // // Solo cuando se muestra el carrito
-  // }, [showCart]);
-
   useEffect(() => {
   // Conecta al servidor de WebSocket
   const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
@@ -236,21 +203,50 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
   socket.on("stockUpdate", (updatedProducts: Product[]) => {
     console.log("Actualización de stock recibida:", updatedProducts);
     setProducts(updatedProducts);
-    setCart([]);
-    localStorage.setItem('cart', JSON.stringify([]));
-    alert("El stock ha sido actualizado. Tu carrito ha sido limpiado. Por favor, revisa los productos disponibles.");
-    //limpiar el carrito si algún producto se queda sin stock
-    // const newCart = cart.filter(item => {
-    //   const product = updatedProducts.find(p => p._id === item._id);
-    //   if (!product) return false; // Producto eliminado
-    //   const availableStock = item.type === 'D' ? product.stockDocena ?? 0 : product.stockIndividual ?? 0;
-    //   return (item.quantity || 1) <= availableStock;
-    // });
-    // if (newCart.length !== cart.length) {
-    //   setCart(newCart);
-    //   localStorage.setItem('cart', JSON.stringify(newCart));
-    //   alert("Algunos productos han sido eliminados de tu carrito debido a falta de stock.");
-    // }
+    //setCart([]);
+    //localStorage.setItem('cart', JSON.stringify([]));
+    //alert("El stock ha sido actualizado. Tu carrito ha sido limpiado. Por favor, revisa los productos disponibles.");
+    
+    //leer el carrito del localStorage
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    console.log("carrito actual:", storedCart);
+    //restar el stock del carrito al stock inicial
+    if(storedCart.length > 0){
+      const productsOnCart = storedCart.map((item: any) => {
+
+        const productsUpdatedOnCart = updatedProducts.find((product : any) => product._id === item._id); //esto devuelve el producto en el carrito que del cliente pero con el stock actual en tiempo real.
+        // productsUpdatedOnCart "No" es un arreglo ya que regresa el (primer elemento);
+        //console.log(productsUpdatedOnCart);
+        if(productsUpdatedOnCart){ //existe un producto que alguien mas compro y esta dentro de su carrito
+          
+          //revisar si el producto en el carrito es de tipo individual o docena
+          if(item.type === "I"){
+            const stockOverFlow = item.quantity - (productsUpdatedOnCart.stockIndividual ?? 0) //por cuantas unidades esta pasada el stock
+            return {
+              ...item,
+              stockIndividual: item.stockIndividual - (productsUpdatedOnCart.stockIndividual ?? 0), //restar el stock Individual para que no sea mayor que el Stock en tiempo real de "productsUpdatedOnCart"
+              quantity: item.quantity - stockOverFlow,
+            }
+          }else{
+
+            const stockOverFlow = item.quantity - (productsUpdatedOnCart.stockDocena ?? 0) //por cuantas unidades esta pasada el stock
+            return {
+              ...item,
+              stockDocena: item.stockDocena - (productsUpdatedOnCart.stockDocena ?? 0),
+              quantity: item.quantity - stockOverFlow,
+            }
+          }
+        }
+
+      });
+      
+      console.log(productsOnCart); //deveria de reflejar cambios en la propiedad "quantity", "stockIndividual" y "stockDocena" para que nunca sean mayores que el "Stock en tiempo real = updatedProducts"
+      localStorage.setItem('cart', JSON.stringify(productsOnCart)); //actualizamos el carrito
+      setCart(productsOnCart); //actualizamos el estado del carrito.
+      alert("El stock ha sido actualizado. Por favor, revisa los productos disponibles.");
+    }
+
+    
   });
 
   // Limpia la conexión al desmontar
@@ -258,6 +254,24 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
       socket.disconnect();
     };
   }, []);
+
+  // useEffect(() => {
+  //   console.log('Estado actualizado de products:', products);
+  //   //acualizar el estado de initialStocks
+
+  //   setInitialStocks(() => {
+  //     const stocks: Record<string, { stockDocena: number, stockIndividual: number }> = {};
+  //     products.forEach((p: Product) => {
+  //       stocks[p._id] = {
+  //         stockDocena: p.stockDocena ?? 0,
+  //         stockIndividual: p.stockIndividual ?? 0,
+  //       };
+  //     });
+  //     return stocks;
+  //   });
+
+  //   console.log(initialStocks);
+  // }, [products]);
 
   return (
     <div>
