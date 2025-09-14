@@ -197,17 +197,23 @@ export const ProductsSection = ({ onShowCart }: { onShowCart?: () => void }) => 
 
   useEffect(() => {
   // Conecta al servidor de WebSocket
-  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
+  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "wss://ws.otra.fun:3001", { transports: ['websocket'] });
 
-  // Escucha el evento 'stockUpdate' desde el servidor
-  socket.on("stockUpdate", (updatedProducts: Product[]) => {
+  try{
+    // Escucha el evento 'stockUpdate' desde el servidor
+    socket.on("stockUpdate", (updatedProducts: Product[]) => {
     console.log("Actualización de stock recibida:", updatedProducts);
     setProducts(updatedProducts);
     setCart([]);
     localStorage.setItem('cart', JSON.stringify([]));
     alert("El stock ha sido actualizado. Tu carrito ha sido limpiado. Por favor, revisa los productos disponibles.");
+    });
+  }
+  catch(error){
+    console.error("Error al conectar con el servidor de WebSocket:", error);
+  }
 
-  });
+  
 
   // Limpia la conexión al desmontar
     return () => {

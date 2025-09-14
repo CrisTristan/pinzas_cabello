@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const endPointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
-  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
+  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "wss://ws.otra.fun:3001", { transports: ['websocket'] });
 
   const body = await request.text(); //aqui se encuentra la direccion del cliente
   const headersList = await headers();
